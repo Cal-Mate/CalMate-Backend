@@ -1,0 +1,91 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.6'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+ext {
+    springCloudVersion = "2025.0.0"
+}
+
+group = 'com.BugHunters'
+version = '0.0.1-SNAPSHOT'
+description = 'mountainspirit'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    testImplementation 'org.springframework.security:spring-security-test'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    testImplementation 'org.springframework.security:spring-security-test'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
+    implementation 'org.modelmapper:modelmapper:3.1.1'
+    // HttpCleint 사용을 위한 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+//==================== JWT 토큰을 위한 라이브러리 ============================
+    // 로그인 시점에 인증된 회원을 위한 JWT 토큰 작성, 이후 토큰 유효성 검사
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    //==================== JWT 토큰을 위한 라이브러리 ============================
+
+
+    //==================== Feign client 위한 라이브러리 ============================
+    //다른 도메인과 통신할 때 필요한 라이브러리(feat. gateway를 활용한 통신)
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    //==================== Feign client 위한 라이브러리 ============================
+
+
+    // Swagger를 위한 라이브러리 추가(SpringDoc OpenAPI(최근), Springfox Swagger(구))
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+
+    // bootstrap.yml을 인지시키기 위한 dependency
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
+
+    // spring boot의 모니터링 시스템 또는 동적 설정 변경 등 부가적인 기능 제공
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+}
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+    }
+}
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
