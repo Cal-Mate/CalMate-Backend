@@ -43,7 +43,7 @@ public class JsonAuthSuccessHandler implements AuthenticationSuccessHandler {
         Long id = user.getId();
         String userName = user.getMemberName();
         UploadFile profile = profileImageRepository.findByMemberId(id);
-        String profilePath = profile != null ? profile.getFilePath() : null;
+        String profilePath = profile != null ? profile.getFilePath() +  profile.getOriginalFileName() : null;
         List<String> authorities = toAuthorityList(authentication.getAuthorities());
 
         if(profilePath != null){
@@ -53,7 +53,7 @@ public class JsonAuthSuccessHandler implements AuthenticationSuccessHandler {
 
             String requestPath = scheme + "://" + serverName +  ":" + port;
 
-            int index = profilePath.indexOf("/uploads");
+            int index = profilePath.indexOf("/img");
             profilePath =  requestPath + profilePath.substring(index,profilePath.length());
         }
 

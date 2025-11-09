@@ -25,7 +25,7 @@ public class JwtUtil {
     private final Key key;
     private final MemberService memberService;
 
-    public JwtUtil(@Value("${token.secret}") String key, MemberService memberService) {
+    public JwtUtil(@Value("${token.access.secret}") String key, MemberService memberService) {
 
         /* 설명. String -> Key로 변환 */
         byte[] keyBytes = Decoders.BASE64.decode(key);
