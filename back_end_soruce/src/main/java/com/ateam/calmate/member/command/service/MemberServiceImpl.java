@@ -273,8 +273,12 @@ public class MemberServiceImpl implements MemberService {
 
         ResponseSignUpDTO responseSignUpDTO = new ResponseSignUpDTO();
         // 중복된 email 혹은 이미 가입된 회원이 있는지조회(이미 가입된 회원 조건은 이름 && 생일이 같은 사람이있는지로 판단)
-        Member findMember
+        List<Member> findMembers
                 = memberRepository.findByEmailOrNameAndBirth(memberDTO.getEmail(), memberDTO.getName(), memberDTO.getBirth());
+
+        Member findMember = null;
+        if(findMembers.size() > 0) findMember = findMembers.get(0);
+//                = memberRepository.findByEmailOrNameAndBirth(memberDTO.getEmail(), memberDTO.getName(), memberDTO.getBirth());
 
         List<AuthorityList> authorityList
                 = authorityRepository.findAll().stream()
@@ -285,6 +289,9 @@ public class MemberServiceImpl implements MemberService {
             //중복 이메일이 있는지 확인
             if (findMember.getEmail().equals(memberDTO.getEmail())) {
                 responseSignUpDTO.setDuplicateEmail(true);
+                return responseSignUpDTO;
+            } else if (findMember.getName().equals(memberDTO.getName())){
+                responseSignUpDTO.setExistingMember(true);
                 return responseSignUpDTO;
             }
 
@@ -298,8 +305,6 @@ public class MemberServiceImpl implements MemberService {
                     return responseSignUpDTO;
                 }
 
-                responseSignUpDTO.setExistingMember(true);
-                return responseSignUpDTO;
             }
 
         } else {

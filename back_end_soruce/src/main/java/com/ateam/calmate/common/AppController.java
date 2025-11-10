@@ -17,13 +17,13 @@ public class AppController {
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck(ServletRequest request) {
          Enumeration<String> d = request.getAttributeNames();
-         while (d.hasMoreElements()) {
-             String header = d.nextElement();
-             System.out.println("=================");
-             System.out.println(header);
-             System.out.println(request.getAttribute(header));
-             System.out.println("=================");
-         }
+//         while (d.hasMoreElements()) {
+//             String header = d.nextElement();
+//             System.out.println("=================");
+//             System.out.println(header);
+//             System.out.println(request.getAttribute(header));
+//             System.out.println("=================");
+//         }
         return ResponseEntity.ok("OK");
     }
 }
