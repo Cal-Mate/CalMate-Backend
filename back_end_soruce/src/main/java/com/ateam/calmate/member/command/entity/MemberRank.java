@@ -14,14 +14,11 @@ public class MemberRank {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    private Long id;          // 1~5 (등급 레벨)
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    private String name;      // "스타터", "챌린저" ...
 
-    @Column(name = "standard")
-    private Integer standard;
-
+    @Column(name = "badge_count")
+    private Integer badgeCount;  // 해당 레벨 최소 필요 뱃지 수
 
 }

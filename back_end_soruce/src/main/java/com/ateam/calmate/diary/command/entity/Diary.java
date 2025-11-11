@@ -1,5 +1,6 @@
 package com.ateam.calmate.diary.command.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,7 +22,7 @@ public class Diary {
     private Integer id;
 
     @Column(nullable = false)
-    private LocalDate day; // DB가 DATETIME 이면 @Column(columnDefinition="datetime") 써도 됨
+    private LocalDate day;
 
     private Integer weight;
 
@@ -37,15 +38,24 @@ public class Diary {
     private Long memberId;
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @Builder.Default                           // ✅ builder() 써도 기본값 유지
     private List<DiaryFile> files = new ArrayList<>();
 
     public void addFile(DiaryFile file) {
-        files.add(file);
+        if (this.files == null) {             // ✅ NPE 안전장치
+            this.files = new ArrayList<>();
+        }
+        this.files.add(file);
         file.setDiary(this);
     }
 
     public void clearFiles() {
-        for (DiaryFile f : files) f.setDiary(null);
-        files.clear();
+        if (this.files != null) {
+            for (DiaryFile f : this.files) {
+                f.setDiary(null);
+            }
+            this.files.clear();
+        }
     }
 }
