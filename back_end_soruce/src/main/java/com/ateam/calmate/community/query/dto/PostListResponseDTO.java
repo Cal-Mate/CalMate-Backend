@@ -10,13 +10,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostListResponseDTO {
-    private int postId;
+    private int id;
     private String title;
     private String content;
     private String createdAt;
     private String tagName;
     private String authorName;  // member의 닉네임
     private String imageUrl;    // 이미지 경로
-    private int likeCount;
-    private int commentCount;
+    private int likes;
+    private int comments;
 }
