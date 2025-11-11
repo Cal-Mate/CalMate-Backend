@@ -14,12 +14,12 @@ public class PointDTO {
     @Builder
     public static class Request {
         private Integer point;
-        private PointEntity.PointDistinction distinction; // EARN, USE
-        private Long memberId;                       // (필수)
-        private Integer diaryId;                     // (선택)
-        private Long calenderId;                     // (선택)
-        private Long gachaEventId;                   // (선택)
-        private Integer bingoBoardId;                // (선택)
+        private PointEntity.PointDistinction distinction;
+        private Long memberId;
+        private Integer diaryId;
+        private Long calenderId;
+        private Long gachaEventId;
+        private Integer bingoBoardId;
 
         public PointEntity toEntity() {
             return PointEntity.builder()

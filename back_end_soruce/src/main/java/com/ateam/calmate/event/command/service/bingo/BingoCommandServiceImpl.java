@@ -37,6 +37,9 @@ public class BingoCommandServiceImpl implements BingoCommandService {
     @Value("${bingo.points.boardBonus:200}")
     private int boardBonusPoint;
 
+    @Value("${bingo.default-extend-file-path-id:1}")
+    private Long defaultExtendFilePathId;
+
     @Override
     @Transactional
     public CheckCellWithUploadResult checkCellWithUpload(CheckCellWithUploadCommand cmd, InputStream fileStream) {
@@ -59,7 +62,7 @@ public class BingoCommandServiceImpl implements BingoCommandService {
                 .reName(saved.storedFileName())
                 .path(saved.relativePath())
                 .createdAt(LocalDateTime.now())
-                .extendFilePathId(cmd.getExtendFilePathId())
+                .extendFilePathId(resolveExtendFilePathId(cmd.getExtendFilePathId()))
                 .build();
         uploadRepo.save(upload);
 
@@ -103,5 +106,12 @@ public class BingoCommandServiceImpl implements BingoCommandService {
                 .uploadedPath(saved.relativePath())
                 .storedFileName(saved.storedFileName())
                 .build();
+    }
+
+    private Long resolveExtendFilePathId(Long requested) {
+        if (requested != null) {
+            return requested;
+        }
+        return defaultExtendFilePathId;
     }
 }

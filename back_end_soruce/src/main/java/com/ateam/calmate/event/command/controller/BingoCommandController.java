@@ -25,7 +25,7 @@ public class BingoCommandController {
             @PathVariable Integer boardId,
             @PathVariable Integer cellId,
             @RequestParam Long memberId,
-            @RequestParam Long extendFilePathId,
+            @RequestParam(required = false) Long extendFilePathId,
             @RequestPart("file") MultipartFile file
     ) throws Exception {
 
