@@ -1,10 +1,11 @@
 package com.ateam.calmate.member.command.entity;
 
+import com.ateam.calmate.member.command.entity.compositeKeys.MemberAuthorityPK;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "MemberAuthority")
+@Table(name = "member_authority")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,15 +13,15 @@ import lombok.*;
 @ToString
 public class MemberAuthority {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
 
-    @Column(name = "cumId", nullable = false)
-    private Long cumId;
-
-    @Column(name = "authId")
-    private Long authId;
+    @EmbeddedId
+    private MemberAuthorityPK memberAuthorityPK;
+//    @Id
+//    @Column(name = "member_id", nullable = false)
+//    private Long memberId;
+//
+//    @Id
+//    @Column(name = "authories_id")
+//    private Long authId;
 
 }

@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class Authority {
-    private Long cumId;
+    private Long memberId;
     private Long authId;
     private String authName;
     private String authDescribe;

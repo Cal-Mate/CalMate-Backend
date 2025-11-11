@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.calendar.query.mapper.CalendarMapper">
+
+    <resultMap id="CalendarResultMap"
+               type="com.ateam.calmate.calendar.query.dto.CalendarDTO">
+        <id     column="id"              property="id"/>
+        <result column="cal_day"         property="calDay"/>
+        <result column="exercise_status" property="exerciseStatus"/>
+        <result column="meal_status"     property="mealStatus"/>
+        <result column="diary_status"    property="diaryStatus"/>
+        <result column="badge_yn"        property="badgeYn"/>
+        <result column="member_id"       property="memberId"/>
+    </resultMap>
+
+    <!-- 기간 조회 -->
+    <select id="selectCalendarRangeByMember"
+            resultMap="CalendarResultMap">
+        SELECT
+            c.id,
+            c.cal_day,
+            c.badge_count,
+            c.exercise_status,
+            c.meal_status,
+            c.diary_status,
+            c.member_id
+        FROM calendar c
+        WHERE c.member_id = #{memberId}
+          AND c.cal_day BETWEEN #{startDate} AND #{endDate}
+        ORDER BY c.cal_day ASC
+    </select>
+
+    <!-- 일별 조회 -->
+    <select id="selectCalendarByDay"
+            resultMap="CalendarResultMap">
+        SELECT
+            c.id,
+            c.cal_day,
+            c.badge_count,
+            c.exercise_status,
+            c.meal_status,
+            c.diary_status,
+            c.member_id
+        FROM calendar c
+        WHERE c.member_id = #{memberId}
+          AND DATE(c.cal_day) = #{day}
+            LIMIT 1
+    </select>
+
+
+    <select id="selectTotalBadgeCountByMember" resultType="int">
+        SELECT COALESCE(SUM(c.badge_yn), 0)
+        FROM calendar c
+        WHERE c.member_id = #{memberId}
+    </select>
+
+</mapper>

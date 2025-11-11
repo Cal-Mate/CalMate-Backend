@@ -2,6 +2,7 @@ package com.ateam.calmate.member.command.dto;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -26,10 +27,11 @@ public class ResponseMemberDTO {
     private Integer loginFailCnt;
     private LocalDateTime quitDate;
     private LocalDateTime loginLockUntil;
+    private Double height;
+    private Double weight;
     private Integer score;
     private Long memRankId;
     private String rankName;
     private Long memStsId;
-    private Long crewId;
     private String profilePath;
 }

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.event.query.mapper.BingoQueryRepository">
+
+    <!-- =========================================================
+         공통 컬럼 Alias 규칙 (DTO 매핑 일관성)
+         - board_id, cell_id, upload_id 등 id 계열은 *_id 로 alias
+         - 진행 집계: checked_count, total_cells, completed_line_count, completed, progress_percent
+       ========================================================= -->
+
+    <!-- =========================
+         (A) 단건 DTO resultMap들
+       ========================= -->
+
+    <!-- 파일 첨부 DTO -->
+    <resultMap id="BingoFileUploadResultMap"
+               type="com.ateam.calmate.event.query.dto.bingo.BingoFileUploadDTO">
+        <id     property="uploadId"        column="upload_id"/>
+        <result property="name"            column="name"/>
+        <result property="mimeType"        column="mime_type"/>
+        <result property="reName"          column="re_name"/>
+        <result property="path"            column="path"/>
+        <result property="createdAt"       column="created_at"/>
+        <result property="extendFilePathId" column="extend_file_path_id"/>
+        <result property="baseUrl"         column="base_url"/>
+        <result property="fullUrl"         column="full_url"/>
+    </resultMap>
+
+    <!-- 셀 DTO (버전 A: uploads를 nested select로 가져옴) -->
+    <resultMap id="BingoCellWithUploads_V1_ResultMap"
+               type="com.ateam.calmate.event.query.dto.bingo.BingoCellDTO">
+        <id     property="cellId"     column="cell_id"/>
+        <result property="row"        column="row"/>
+        <result property="col"        column="col"/>
+        <result property="label"      column="label"/>
+        <!-- TINYINT(1) → boolean -->
+        <result property="checked"    column="checked"    javaType="boolean"/>
+        <result property="checkedAt"  column="checked_at"/>
+
+        <!-- 첨부: 셀당 1번씩 별도 쿼리 (간단하지만 N+1 가능) -->
+        <collection property="uploads"
+                    ofType="com.ateam.calmate.event.query.dto.bingo.BingoFileUploadDTO"
+                    select="selectUploadsByCellId"
+                    column="cell_id"/>
+    </resultMap>
+
+    <!-- 보드 상세 DTO (버전 A: cells를 nested select로 가져옴) -->
+    <resultMap id="BingoBoardDetail_V1_ResultMap"
+               type="com.ateam.calmate.event.query.dto.bingo.BingoBoardDTO">
+        <id     property="boardId"            column="board_id"/>
+        <result property="title"              column="title"/>
+        <result property="size"               column="size"/>
+        <result property="startDate"          column="start_date"/>
+        <result property="endDate"            column="end_date"/>
+        <result property="createdAt"          column="created_at"/>
+        <result property="memberId"           column="member_id"/>
+        <result property="checkedCount"       column="checked_count"/>
+        <result property="totalCells"         column="total_cells"/>
+        <result property="completedLineCount" column="completed_line_count"/>
+        <result property="completed"          column="completed" javaType="boolean"/>
+        <result property="progressPercent"    column="progress_percent" javaType="double"/>
+
+        <!-- 셀 목록: 보드 1건 기준 셀 전체를 별도 쿼리로 -->
+        <collection property="cells"
+                    ofType="com.ateam.calmate.event.query.dto.bingo.BingoCellDTO"
+                    select="selectCellsByBoardId"
+                    column="board_id"/>
+    </resultMap>
+
+    <!-- =========================
+         (B) 조인 1방용 resultMap
+         - resultOrdered="true" + 정렬로 계층 그룹핑
+         - 업로드 컬렉션까지 한 번에(고급/선택)
+       ========================= -->
+
+    <!-- 하위: 업로드 컬렉션의 개별 아이템 맵 -->
+    <resultMap id="BingoFileUpload_JoinItem_ResultMap"
+               type="com.ateam.calmate.event.query.dto.bingo.BingoFileUploadDTO">
+        <id     property="uploadId"        column="upload_id"/>
+        <result property="name"            column="name"/>
+        <result property="mimeType"        column="mime_type"/>
+        <result property="reName"          column="re_name"/>
+        <result property="path"            column="path"/>
+        <result property="createdAt"       column="upload_created_at"/>
+        <result property="extendFilePathId" column="extend_file_path_id"/>
+        <result property="baseUrl"         column="base_url"/>
+        <result property="fullUrl"         column="full_url"/>
+    </resultMap>
+
+    <!-- 중간: 셀 + (업로드 컬렉션) -->
+    <resultMap id="BingoCell_Join_ResultMap"
+               type="com.ateam.calmate.event.query.dto.bingo.BingoCellDTO">
+        <id     property="cellId"     column="cell_id"/>
+        <result property="row"        column="row"/>
+        <result property="col"        column="col"/>
+        <result property="label"      column="label"/>
+        <result property="checked"    column="checked" javaType="boolean"/>
+        <result property="checkedAt"  column="checked_at"/>
+
+        <collection property="uploads"
+                    ofType="com.ateam.calmate.event.query.dto.bingo.BingoFileUploadDTO"
+                    resultMap="BingoFileUpload_JoinItem_ResultMap"/>
+    </resultMap>
+
+    <!-- 상위: 보드 + (셀 컬렉션) + (각 셀의 업로드) -->
+    <resultMap id="BingoBoardDetail_V2_ResultMap"
+               type="com.ateam.calmate.event.query.dto.bingo.BingoBoardDTO">
+        <id     property="boardId"            column="board_id"/>
+        <result property="title"              column="title"/>
+        <result property="size"               column="size"/>
+        <result property="startDate"          column="start_date"/>
+        <result property="endDate"            column="end_date"/>
+        <result property="createdAt"          column="created_at"/>
+        <result property="memberId"           column="member_id"/>
+        <result property="checkedCount"       column="checked_count"/>
+        <result property="totalCells"         column="total_cells"/>
+        <result property="completedLineCount" column="completed_line_count"/>
+        <result property="completed"          column="completed" javaType="boolean"/>
+        <result property="progressPercent"    column="progress_percent" javaType="double"/>
+
+        <collection property="cells"
+                    ofType="com.ateam.calmate.event.query.dto.bingo.BingoCellDTO"
+                    resultMap="BingoCell_Join_ResultMap"/>
+    </resultMap>
+
+    <!-- =========================
+         (1) 월별 보드 요약
+       ========================= -->
+    <select id="selectBoardSummaryByMemberAndMonth"
+            parameterType="map"
+            resultType="com.ateam.calmate.event.query.dto.bingo.BingoBoardSummaryDTO">
+        SELECT
+        bb.id                         AS board_id,
+        bb.title                      AS title,
+        bb.size                       AS size,
+        bb.start_date                 AS start_date,
+        bb.end_date                   AS end_date,
+        bb.created_at                 AS created_at,
+        bb.member_id                  AS member_id,
+        IFNULL(SUM(CASE WHEN bc.is_checked = 1 THEN 1 ELSE 0 END), 0) AS checked_count,
+        (bb.size * bb.size)           AS total_cells,
+        /* 라인 수/완료여부는 서비스에서 계산해도 되지만 예시로 0 처리(필요 시 프로시저/함수로 대체) */
+        0                             AS completed_line_count,
+        0                             AS completed,
+        (IFNULL(SUM(CASE WHEN bc.is_checked = 1 THEN 1 ELSE 0 END), 0) / (bb.size * bb.size)) * 100
+        AS progress_percent
+        FROM bingo_board bb
+        LEFT JOIN bingo_cell bc
+        ON bc.bingo_board_id = bb.id
+        WHERE bb.member_id = #{memberId}
+        AND DATE_FORMAT(bb.start_date, '%Y-%m') = #{yearMonth}  /* 예: '2025-11' */
+        GROUP BY bb.id
+        LIMIT 1
+    </select>
+
+    <!-- =========================
+         (2A) 보드 상세 V1 (Nested Select)
+              - 보드 1건을 가져오고,
+              - cells는 selectCellsByBoardId
+              - uploads는 selectUploadsByCellId
+       ========================= -->
+    <select id="selectBoardDetailV1"
+            parameterType="int"
+            resultMap="BingoBoardDetail_V1_ResultMap">
+        SELECT
+        bb.id             AS board_id,
+        bb.title          AS title,
+        bb.size           AS size,
+        bb.start_date     AS start_date,
+        bb.end_date       AS end_date,
+        bb.created_at     AS created_at,
+        bb.member_id      AS member_id,
+        IFNULL(SUM(CASE WHEN bc.is_checked = 1 THEN 1 ELSE 0 END), 0) AS checked_count,
+        (bb.size * bb.size)  AS total_cells,
+        0                  AS completed_line_count,
+        0                  AS completed,
+        (IFNULL(SUM(CASE WHEN bc.is_checked = 1 THEN 1 ELSE 0 END), 0) / (bb.size * bb.size)) * 100
+        AS progress_percent
+        FROM bingo_board bb
+        LEFT JOIN bingo_cell bc
+        ON bc.bingo_board_id = bb.id
+        WHERE bb.id = #{boardId}
+        GROUP BY bb.id
+    </select>
+
+    <select id="selectCellsByBoardId"
+            parameterType="int"
+            resultMap="BingoCellWithUploads_V1_ResultMap">
+        SELECT
+        bc.id          AS cell_id,
+        bc.`row`       AS `row`,
+        bc.`col`       AS `col`,
+        bc.label       AS label,
+        bc.is_checked  AS checked,
+        bc.checked_at  AS checked_at
+        FROM bingo_cell bc
+        WHERE bc.bingo_board_id = #{boardId}
+        ORDER BY bc.`row`, bc.`col`
+    </select>
+
+    <select id="selectUploadsByCellId"
+            parameterType="int"
+            resultMap="BingoFileUploadResultMap">
+        SELECT
+        bfu.id                    AS upload_id,
+        bfu.name                  AS name,
+        bfu.mime_type             AS mime_type,
+        bfu.re_name               AS re_name,
+        bfu.path                  AS path,
+        bfu.created_at            AS created_at,
+        bfu.extend_file_path_id   AS extend_file_path_id,
+        efp.url_path              AS base_url,
+        CONCAT(efp.url_path, bfu.path) AS full_url
+        FROM bingo_fileupload bfu
+        LEFT JOIN extend_file_path efp
+        ON efp.id = bfu.extend_file_path_id
+        WHERE bfu.bingo_cell_id = #{cellId}
+        ORDER BY bfu.id DESC
+    </select>
+
+    <!-- =========================
+         (2B) 보드 상세 V2 (조인 1방)
+              - resultOrdered="true"와 정렬로 컬렉션 그룹핑
+              - 대량 첨부가 많지 않다면 성능 우수
+       ========================= -->
+    <select id="selectBoardDetailV2"
+            parameterType="int"
+            resultMap="BingoBoardDetail_V2_ResultMap"
+            resultOrdered="true">
+        SELECT
+        /* 상위(보드) */
+        bb.id             AS board_id,
+        bb.title          AS title,
+        bb.size           AS size,
+        bb.start_date     AS start_date,
+        bb.end_date       AS end_date,
+        bb.created_at     AS created_at,
+        bb.member_id      AS member_id,
+        boardAgg.checked_count AS checked_count,
+        (bb.size * bb.size)    AS total_cells,
+        0                AS completed_line_count,
+        0                AS completed,
+        (boardAgg.checked_count / (bb.size * bb.size)) * 100 AS progress_percent,
+
+        /* 중간(셀) */
+        bc.id            AS cell_id,
+        bc.`row`         AS `row`,
+        bc.`col`         AS `col`,
+        bc.label         AS label,
+        bc.is_checked    AS checked,
+        bc.checked_at    AS checked_at,
+
+        /* 하위(업로드) */
+        bfu.id                    AS upload_id,
+        bfu.name                  AS name,
+        bfu.mime_type             AS mime_type,
+        bfu.re_name               AS re_name,
+        bfu.path                  AS path,
+        bfu.created_at            AS upload_created_at,
+        bfu.extend_file_path_id   AS extend_file_path_id,
+        efp.url_path              AS base_url,
+        CONCAT(efp.url_path, bfu.path) AS full_url
+
+        FROM bingo_board bb
+
+        /* 진행 집계 (체크된 칸 수) */
+        LEFT JOIN (
+        SELECT
+        bc2.bingo_board_id AS board_id,
+        IFNULL(SUM(CASE WHEN bc2.is_checked = 1 THEN 1 ELSE 0 END), 0) AS checked_count
+        FROM bingo_cell bc2
+        GROUP BY bc2.bingo_board_id
+        ) AS boardAgg
+        ON boardAgg.board_id = bb.id
+
+        /* 셀 */
+        LEFT JOIN bingo_cell bc
+        ON bc.bingo_board_id = bb.id
+
+        /* 업로드 베이스 URL */
+        LEFT JOIN bingo_fileupload bfu
+        ON bfu.bingo_cell_id = bc.id
+        LEFT JOIN extend_file_path efp
+        ON efp.id = bfu.extend_file_path_id
+
+        WHERE bb.id = #{boardId}
+
+        /* 보드 → 셀 → 업로드 순으로 정렬(그룹핑 안정화) */
+        ORDER BY bb.id, bc.`row`, bc.`col`, bfu.id DESC
+    </select>
+
+</mapper>

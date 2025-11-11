@@ -2,12 +2,12 @@ package com.ateam.calmate.member.command.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity(name="member1")
-@Table(name = "Member")
+@Entity(name = "member")
+@Table(name = "member")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,61 +20,57 @@ public class Member {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "memId", nullable = false)
-    private String memId;
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "nickname")
+    private String nickname;
 
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "nickname", nullable = false)
-    private String nickname;
+    @Column(name = "pw", nullable = false)
+    private String pw;
 
-    @Column(name = "memPwd", nullable = false)
-    private String memPwd;
+    @Column(name = "phone")
+    private String phone;
 
-    @Column(name = "memName", nullable = false)
-    private String memName;
-
-    @Column(name = "birth", nullable = false)
-    private LocalDate birth;
-
-    @Column(name = "gender", nullable = false)
+    @Column(name = "gender", length = 1)
     private String gender;
 
-    @Column(name = "signInDate", nullable = false)
-    private LocalDate signInDate;
+    @Column(name = "birth")
+    private LocalDate birth;
 
-    @Column(name = "lastLogin")
-    private LocalDateTime lastLogin;
+    @Column(name = "height", precision = 5, scale = 2)
+    private BigDecimal height;
 
-    @Column(name = "climbCnt", nullable = false, insertable = false, updatable = true)
-    private Long climbCnt;
+    @Column(name = "weight", precision = 5, scale = 2)
+    private BigDecimal weight;
 
-    @Column(name = "banCnt")
-    private Integer banCnt;
+    @Column(name = "body_metric")
+    private Integer bodyMetric;
 
-    @Column(name = "loginFailCnt")
-    private Integer loginFailCnt;
+    @Column(name = "point", insertable = false )
+    private Integer point;
 
-    @Column(name = "quitDate")
-    private LocalDateTime quitDate;
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "loginLockUntil")
+    @Column(name = "login_failure_count", insertable = false)
+    private Integer loginFailureCount;
+
+    @Column(name = "login_lock_until")
     private LocalDateTime loginLockUntil;
 
-    @Column(name = "score", nullable = false, insertable = false, updatable = true)
-    private Integer score;
+    @Column(name = "quit_date")
+    private LocalDateTime quitDate;
 
-    @Column(name = "memRankId")
-    private Long memRankId;
+    @Column(name = "status", nullable = false)
+    private Long status;
 
-    @Column(name = "memStsId")
-    private Long memStsId;
+    @Column(name = "level", nullable = false)
+    private Long level;
 
-    @Column(name = "crewId")
-    private Long crewId;
-
-//    @OneToMany(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "cumId")
-//    private List<MemberAuthority> authorities;
+    @Column(name = "ban_cnt" , insertable = false)
+    private Integer banCnt;
 }

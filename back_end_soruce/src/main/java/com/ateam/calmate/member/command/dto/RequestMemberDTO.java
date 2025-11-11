@@ -13,12 +13,15 @@ import java.time.LocalDate;
 public class RequestMemberDTO {
 
     private Long id;
-    private String memId;
     private String email;
     private String nickname;
-    private String memPwd;
-    private String memName;
+    private String phone;
+    private String pw;
+    private Double weight;
+    private Double height;
+    private int bodyMetric;
+    private String name;
     private LocalDate birth;
     private String gender;
-    private LocalDate signInDate;
+    private LocalDate createdAt;
 }

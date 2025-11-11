@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.community.query.mapper.PostMapperRank">
+
+    <select id="findCommunityRank" resultType="com.ateam.calmate.community.query.dto.CommunityRankDTO">
+        SELECT
+            m.id AS memberId,
+            m.nickname AS nickname,
+            COUNT(pl.id) AS totalLikes
+        FROM post p
+                 JOIN member m ON p.member_id = m.id
+                 LEFT JOIN post_like pl ON p.id = pl.post_id
+        GROUP BY m.id, m.nickname
+        ORDER BY totalLikes DESC
+            LIMIT 20;
+    </select>
+
+</mapper>
