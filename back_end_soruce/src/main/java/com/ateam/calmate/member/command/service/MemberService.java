@@ -1,6 +1,7 @@
 package com.ateam.calmate.member.command.service;
 
 import com.ateam.calmate.member.command.dto.*;
+import com.ateam.calmate.member.command.entity.Member;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,4 +30,6 @@ public interface MemberService {
     boolean checkPassowrd(CheckPasswordDTO checkPasswordDTO);
 
     boolean modifyPassword(ModifyPasswordDTO modifyPasswordDTO);
+
+    void calculatePoint(Long member_id, int id);
 }

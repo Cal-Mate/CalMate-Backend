@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.dietManagement.query.mapper.MealRecordQueryMapper">
+
+    <resultMap id="MealRecordRowMap" type="com.ateam.calmate.dietManagement.query.dto.MealRecordRow">
+        <result column="meal_id" property="mealId"/>
+        <result column="date" property="date"/>
+        <result column="type" property="type"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="member_id" property="memberId"/>
+
+        <result column="food_id" property="foodId"/>
+        <result column="food_name" property="foodName"/>
+        <result column="gram" property="gram"/>
+        <result column="kcal" property="kcal"/>
+        <result column="carbo" property="carbo"/>
+        <result column="protein" property="protein"/>
+        <result column="fat" property="fat"/>
+        <result column="sodium" property="sodium"/>
+
+        <result column="file_id" property="fileId"/>
+        <result column="file_name" property="fileName"/>
+        <result column="file_url" property="fileUrl"/>
+        <result column="thumb_url" property="thumbUrl"/>
+        <result column="upload_order" property="uploadOrder"/>
+    </resultMap>
+
+    <select id="selectMealRecords" resultMap="MealRecordRowMap">
+        SELECT
+            m.id            AS meal_id,
+            m.date          AS date,
+            m.type          AS type,
+            m.created_at    AS created_at,
+            m.member_id     AS member_id,
+
+            fd.id           AS food_id,
+            fd.name         AS food_name,
+            fd.gram         AS gram,
+            fd.kcal         AS kcal,
+            fd.carbo        AS carbo,
+            fd.protein      AS protein,
+            fd.fat          AS fat,
+            fd.sodium       AS sodium,
+
+            f.id            AS file_id,
+            f.name          AS file_name,
+            -- url_path = '/img/meal/', re_name = 'uuid.png'
+            CONCAT(COALESCE(p.url_path, ''), f.re_name)                  AS file_url,
+            CONCAT(COALESCE(p.url_path, ''), COALESCE(f.thumb_path, '')) AS thumb_url,
+            f.upload_order  AS upload_order
+        FROM meal m
+            LEFT JOIN meal_food mf
+        ON m.id = mf.meal_id
+            LEFT JOIN food fd
+            ON mf.food_id = fd.id
+            LEFT JOIN food_fileupload f
+            ON m.id = f.meal_id
+            LEFT JOIN extend_file_path p
+            ON f.extend_file_path_id = p.id
+        WHERE m.member_id = #{memberId}
+          AND m.date = #{date}
+          AND m.type = #{type}
+        ORDER BY m.created_at DESC, m.id DESC, f.upload_order ASC
+    </select>
+
+</mapper>

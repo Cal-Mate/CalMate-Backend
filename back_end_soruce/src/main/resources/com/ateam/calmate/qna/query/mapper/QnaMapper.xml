@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.qna.query.mapper.QnaMapper">
+
+    <!-- 댓글 ResultMap -->
+    <resultMap id="QnaCommentResultMap"
+               type="com.ateam.calmate.qna.query.dto.QnaCommentResponse">
+        <id     column="comment_id"          property="id"/>
+        <result column="comment"             property="comment"/>
+        <result column="comment_created_at"  property="createdAt"/>
+        <result column="comment_qna_id"      property="qnaId"/>
+        <result column="comment_member_id"   property="memberId"/>
+        <result column="parent_comment_id"   property="parentCommentId"/>
+    </resultMap>
+
+    <!-- QnA + 댓글 ResultMap -->
+    <resultMap id="QnaResultMap"
+               type="com.ateam.calmate.qna.query.dto.QnaResponse">
+        <id     column="qna_id"         property="id"/>
+        <result column="title"          property="title"/>
+        <result column="contents"       property="contents"/>
+        <result column="qna_created_at" property="createdAt"/>
+        <result column="qna_member_id"  property="memberId"/>
+
+        <collection property="comments"
+                    ofType="com.ateam.calmate.qna.query.dto.QnaCommentResponse"
+                    resultMap="QnaCommentResultMap"/>
+    </resultMap>
+
+    <!-- 전체 리스트 -->
+    <select id="selectQnaList" resultMap="QnaResultMap">
+        SELECT
+            q.id               AS qna_id,
+            q.title            AS title,
+            q.contents         AS contents,
+            q.created_at       AS qna_created_at,
+            q.member_id        AS qna_member_id,
+            qc.id              AS comment_id,
+            qc.comment         AS comment,
+            qc.created_at      AS comment_created_at,
+            qc.qna_id          AS comment_qna_id,
+            qc.member_id       AS comment_member_id,
+            qc.parent_comment_id AS parent_comment_id
+        FROM qna q
+                 LEFT JOIN qna_comment qc ON q.id = qc.qna_id
+        ORDER BY q.id DESC,
+                 qc.parent_comment_id IS NULL DESC,
+                 qc.parent_comment_id ASC,
+                 qc.id ASC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 내 QnA 리스트 -->
+    <select id="selectMyQnaList" resultMap="QnaResultMap">
+        SELECT
+            q.id               AS qna_id,
+            q.title            AS title,
+            q.contents         AS contents,
+            q.created_at       AS qna_created_at,
+            q.member_id        AS qna_member_id,
+            qc.id              AS comment_id,
+            qc.comment         AS comment,
+            qc.created_at      AS comment_created_at,
+            qc.qna_id          AS comment_qna_id,
+            qc.member_id       AS comment_member_id,
+            qc.parent_comment_id AS parent_comment_id
+        FROM qna q
+                 LEFT JOIN qna_comment qc ON q.id = qc.qna_id
+        WHERE q.member_id = #{memberId}
+        ORDER BY q.id DESC,
+                 qc.parent_comment_id IS NULL DESC,
+                 qc.parent_comment_id ASC,
+                 qc.id ASC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 상세 (댓글 포함) -->
+    <select id="selectQnaDetail" resultMap="QnaResultMap">
+        SELECT
+            q.id               AS qna_id,
+            q.title            AS title,
+            q.contents         AS contents,
+            q.created_at       AS qna_created_at,
+            q.member_id        AS qna_member_id,
+            qc.id              AS comment_id,
+            qc.comment         AS comment,
+            qc.created_at      AS comment_created_at,
+            qc.qna_id          AS comment_qna_id,
+            qc.member_id       AS comment_member_id,
+            qc.parent_comment_id AS parent_comment_id
+        FROM qna q
+                 LEFT JOIN qna_comment qc ON q.id = qc.qna_id
+        WHERE q.id = #{qnaId}
+        ORDER BY qc.parent_comment_id IS NULL DESC,
+                 qc.parent_comment_id ASC,
+                 qc.id ASC
+    </select>
+
+</mapper>

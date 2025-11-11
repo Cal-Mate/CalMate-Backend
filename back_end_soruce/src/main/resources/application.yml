@@ -1,13 +1,13 @@
 server:
-  port: 8085
+  port: 8081
 spring:
   application:
     name: member-client
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/project_4st
-    username: swcamp
-    password: swcamp
+    url: jdbc:mariadb://localhost:3306/calmate?&rewriteBatchedStatements=true
+    username: root
+    password: mariadb
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -34,7 +34,7 @@ spring:
       max-request-size: 200MB      # 업로드 요청당 총 용량(default 10MB)
   web:
     resources:
-      static-locations: file:///C:/uploadFiles/     # 정적 리소스 경로
+      static-locations: file:./uploads/
       cache-period: 3600                            # 웹 브라우저의 캐싱 시간(초, 1시간)
 
 logging:
@@ -45,8 +45,12 @@ logging:
 
 
 token:
-  secret: v7o98gdK42iddFqTxH07Yjv18KbwIZWQZu7NRPeR9+ji9tOGDX2r8PO3mGptklEdEiIB0RMT066q3qb19YBfqQ==
-  expiration_time: 43200000 # 12시간
+  access:
+    secret: v7o98gdK42iddFqTxH07Yjv18KbwIZWQZu7NRPeR9+ji9tOGDX2r8PO3mGptklEdEiIB0RMT066q3qb19YBfqQ==
+    expiration_time: 600000 # 10 분
+  refresh:
+    secret: QUohbgcqwRhk+Xi7zbhgWrkGA0SFRI6OIjzjOsPMtXN5G6RtwBuX0UKENxM07M9WRQBnSuvmU3J4GEpPzqWj/w==
+    expiration_time: 86400000 # 1 일 [ms] 단위
 
 
 
@@ -63,10 +67,17 @@ management:
       enabled: true
     os:
       enabled: true
-
-
-
+app:
+  cookie:
+    domain: calMate.com
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
 
 # 프로필 이지미 관련 경로
 profile:
   dirPath: /img/profile/
+
+mybatis:
+  mapper-locations: classpath*:com/ateam/calmate/**/mapper/*Mapper.xml

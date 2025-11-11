@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 public class BlackListDTO {
-    private Long id;
     private LocalDateTime createDate;
     private Long adminId;
     private Long memberId;

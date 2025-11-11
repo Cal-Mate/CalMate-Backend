@@ -3,6 +3,7 @@ package com.ateam.calmate.security;
 
 import com.ateam.calmate.member.command.dto.RequsetloginHisotry;
 import com.ateam.calmate.member.command.dto.UserImpl;
+import com.ateam.calmate.member.command.entity.Member;
 import com.ateam.calmate.member.command.service.MemberService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +83,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
         //회원 상태에 따라 토큰을 발행하지 않고 로그인 실패처리
         checkMemberStatus(user);
+
+        //로그인시 포인트 흭득 로직
+        memberService.calculatePoint(user.getId(), 1);
 
         //여기 까지 오면 정상 로그인 상태로 로그인 히스토리 저장
         memberService.updateCompleteLogin(loginHistory);

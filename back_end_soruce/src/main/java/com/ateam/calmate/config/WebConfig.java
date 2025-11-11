@@ -8,36 +8,48 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
     @Value("${profile.dirPath}")
-    String profileDirPath;
-
-    // ✅ 이미지 업로드 저장 경로
-    // private final String uploadDir = System.getProperty("user.dir") + "/uploads/";
-
+    private String profileDirPath;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/img/single/**")
-                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/single/");
+        String baseDir = System.getProperty("user.dir");
 
+        // 프로필 단건 이미지
+        registry.addResourceHandler("/img/single/**")
+                .addResourceLocations("file:" + baseDir + "/img/single/");
+
+        // 프로필 업로드 경로 (ex: /uploads/profile/)
         registry.addResourceHandler(profileDirPath + "**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + profileDirPath);
 
-        // ✅ 여기가 중요 (게시판 이미지, 식단 업로드 이미지, exercise 등)
-        registry.addResourceHandler("/img/community/**")
-                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/community/");
+        registry.addResourceHandler("/img/meal/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/meal/");
+
+        registry.addResourceHandler("/img/exercise/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/exercise/");
     }
 
 
+        // 운동 기본 이미지
+        registry.addResourceHandler("/img/exercise/**")
+                .addResourceLocations("file:" + baseDir + "/img/exercise/");
+
+        // 공통 업로드 파일
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + baseDir + "/uploads/");
+
+        // (필요하면) 식단 업로드 개별 매핑
+        registry.addResourceHandler("/uploads/meal/**")
+                .addResourceLocations("file:" + baseDir + "/uploads/meal/");
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")                  // origin 이후 요청 경로 패턴
-                .allowedOrigins("*")        // origin 등록(어떤 front 서버든 상관 없이 허용)
-                // .allowedOrigins("http://localhost:5173")        // origin 등록
-                // .allowedOrigins("http://localhost:8011")        // origin 등록(프론트가 컨테이너화 된 이후)
-//                .allowedOrigins("http://localhost:30000")        // origin 등록(k8s nodeport 이후)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+        registry.addMapping("/**")
+                // 프론트 주소 확정되면 여기서 제한하면 됨
+                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
     }
-
 }

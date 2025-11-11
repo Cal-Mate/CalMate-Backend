@@ -28,11 +28,16 @@ public class WebSecurity {
 
     private JwtAuthenticationProvider jwtAuthenticationProvider;
     private Environment env;        // JWT Token의 payload에 만료시간 만들기위해 추가
+    private JwtFactory jwtFactory;
+    private CookieUtil  cookieUtil;
 
     @Autowired
-    public WebSecurity(JwtAuthenticationProvider jwtAuthenticationProvider, Environment env) {
+    public WebSecurity(JwtAuthenticationProvider jwtAuthenticationProvider, Environment env,
+                       JwtFactory jwtFactory, CookieUtil  cookieUtil) {
         this.jwtAuthenticationProvider = jwtAuthenticationProvider;
         this.env = env;
+        this.jwtFactory = jwtFactory;
+        this.cookieUtil = cookieUtil;
     }
 
     /* 설명. 새로 생성한 프로바이더 bean으로 등록 */
@@ -95,6 +100,8 @@ public class WebSecurity {
         config.setAllowedOrigins(List.of("http://localhost:5173")); // * 금지(크리덴셜 쓰면)
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
+        // 브라우저가 읽을 수 있도록 노출
+        config.setExposedHeaders(List.of("token", "Authorization"));
         config.setAllowCredentials(true); // 세션/쿠키 쓸 때
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -105,7 +112,8 @@ public class WebSecurity {
     private Filter getAuthenticationFilter(AuthenticationManager authenticationManager
             , JsonAuthFailureHandler failure
             , JsonAuthSuccessHandler  success) throws Exception {
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, env);
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, env, jwtFactory,
+                cookieUtil);
         authenticationFilter.setAuthenticationFailureHandler(failure);
         authenticationFilter.setAuthenticationSuccessHandler(success);
         return authenticationFilter;

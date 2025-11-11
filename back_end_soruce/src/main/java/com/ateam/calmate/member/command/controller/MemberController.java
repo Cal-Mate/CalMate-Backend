@@ -42,7 +42,7 @@ public class MemberController {
 
         try {
             // BCrypt 암호화
-            member.setMemPwd(bCryptPasswordEncoder.encode(member.getMemPwd()));
+            member.setPw(bCryptPasswordEncoder.encode(member.getPw()));
 
             ResponseSignUpDTO memberSignUpDTO = memberService.signUp(member);
             Map<String, Object> responseMap = new HashMap<>();
@@ -51,12 +51,12 @@ public class MemberController {
             HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
 
             if (memberSignUpDTO.isBanMember()) {
-                responseMessage.setMessage(member.getMemName() + " 회원님은 가입이 제한된 회원 입니다.");
+                responseMessage.setMessage(member.getName() + " 회원님은 가입이 제한된 회원 입니다.");
                 responseMap.put("memberInfo", memberSignUpDTO.getBlackListDTO());
             } else if (memberSignUpDTO.isDuplicateEmail()) {
                 responseMessage.setMessage(member.getEmail() + " 이미 존재하는 이메일입니다. 이메일 주소를 확인해 주세요");
             } else if (memberSignUpDTO.isExistingMember()) {
-                responseMessage.setMessage(member.getMemName() + " 님은 이미 존재하는 회원 정보입니다.");
+                responseMessage.setMessage(member.getName() + " 님은 이미 존재하는 회원 정보입니다.");
             } else {
                 httpStatus = HttpStatus.OK;
                 responseMap.put("회원 정보", memberSignUpDTO.getMemberDTO());
