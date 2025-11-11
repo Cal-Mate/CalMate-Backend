@@ -6,7 +6,6 @@
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/back_end_soruce" />
         <option name="gradleJvm" value="homebrew-17" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/back_end_soruce" />
