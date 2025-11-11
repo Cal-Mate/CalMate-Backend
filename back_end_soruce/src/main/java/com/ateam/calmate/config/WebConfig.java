@@ -18,6 +18,12 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler(profileDirPath + "**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + profileDirPath);
+
+        registry.addResourceHandler("/img/meal/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/meal/");
+
+        registry.addResourceHandler("/img/exercise/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/exercise/");
     }
 
 

@@ -1,19 +1,7 @@
 package com.ateam.calmate.exerciseRecords.command.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,22 +21,18 @@ public class Exercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private LocalDate date;
 
-    @Column(nullable = false, length = 100)
     private String type;
 
-    @Column(length = 50)
     private String category;
 
-    @Column(name = "min", nullable = false)
     private Integer min;
 
-    @Column(name = "burned_kcal", nullable = false)
+    @Column(name = "burned_kcal")
     private Integer burnedKcal;
 
-    @Column(name = "create_at", nullable = false, updatable = false)
+    @Column(name = "create_at")
     private LocalDateTime createAt;
 
     @Column(name = "member_id", nullable = false)
@@ -65,8 +49,16 @@ public class Exercise {
         }
     }
 
-    public void addFile(ExerciseFileUpload fileUpload) {
-        files.add(fileUpload);
-        fileUpload.setExercise(this);
+    // 연관관계 편의 메서드
+    public void addFile(ExerciseFileUpload file) {
+        files.add(file);
+        file.setExercise(this);
+    }
+
+    public void clearFiles() {
+        for (ExerciseFileUpload f : files) {
+            f.setExercise(null);
+        }
+        files.clear();
     }
 }
