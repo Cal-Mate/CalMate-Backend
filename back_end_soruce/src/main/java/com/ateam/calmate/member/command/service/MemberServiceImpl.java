@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,12 +35,15 @@ public class MemberServiceImpl implements MemberService {
     private final MemberQueryService memberQueryService;
     private final ModelMapper modelMapper;
     private final LoginFailureRecordRepository loginFailureRecordRepository;
-    private final LoginRecordRepository loginRecordRepository;
+    private final LoginHistoryRepository loginHistoryRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthorityRepository authorityRepository;
     private final ProfileImageService profileImageService;
     private final ProfileImageRepository profileImageRepository;
     private final MemberAuthorityRepository memberAuthorityRepository;
+    private final BaseOfPointRepository baseOfPointRepository;
+    private final PointRepository pointRepository;
+
 
     private final PasswordEncoder passwordEncoder;  //평문과 암호화 된 다이제스트를 비교하기 위한 도구
 
@@ -49,23 +53,27 @@ public class MemberServiceImpl implements MemberService {
             , ModelMapper modelMapper
             , BCryptPasswordEncoder bCryptPasswordEncoder
             , LoginFailureRecordRepository loginFailureRecordRepository
-            , LoginRecordRepository loginRecordRepository
+            , LoginHistoryRepository loginHistoryRepository
             , AuthorityRepository authorityRepository
             , ProfileImageService profileImageService
             , ProfileImageRepository profileImageRepository
             , PasswordEncoder passwordEncoder
-            , MemberAuthorityRepository memberAuthorityRepository) {
+            , MemberAuthorityRepository memberAuthorityRepository
+            , BaseOfPointRepository baseOfPointRepository
+            , PointRepository pointRepository) {
         this.memberRepository = memberRepository;
         this.memberQueryService = memberQueryService;
         this.modelMapper = modelMapper;
         this.loginFailureRecordRepository = loginFailureRecordRepository;
-        this.loginRecordRepository = loginRecordRepository;
+        this.loginHistoryRepository = loginHistoryRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.authorityRepository = authorityRepository;
         this.profileImageService = profileImageService;
         this.profileImageRepository = profileImageRepository;
         this.passwordEncoder = passwordEncoder;
         this.memberAuthorityRepository = memberAuthorityRepository;
+        this.baseOfPointRepository = baseOfPointRepository;
+        this.pointRepository = pointRepository;
     }
 
     @Override
@@ -186,7 +194,7 @@ public class MemberServiceImpl implements MemberService {
         member.setLoginFailureCount(0);
 //        member.setLastLogin(loginRecord.getDate());
         memberRepository.save(member);
-        loginRecordRepository.save(loginRecord);
+        loginHistoryRepository.save(loginRecord);
     }
 
     @Override
@@ -212,19 +220,18 @@ public class MemberServiceImpl implements MemberService {
     public ResponseProfileImageDTO updateProfileImage(MultipartFile singleFile, Long id, HttpServletRequest request) {
         ResponseProfileImageDTO responseProfileImageDTO = null;
         try {
-            responseProfileImageDTO = profileImageService.updateProfileImage(singleFile, id , request);
+            responseProfileImageDTO = profileImageService.updateProfileImage(singleFile, id, request);
 
             UploadFile findProfile = profileImageRepository.findByMemberId(id);
 
             //파일이 없었을때
-            if(findProfile == null){
+            if (findProfile == null) {
                 findProfile = modelMapper.map(responseProfileImageDTO, UploadFile.class);
             } else { // 기존 파일이있어서 덮어 쓰기
                 findProfile.setFilePath(responseProfileImageDTO.getFilePath());
                 findProfile.setFilePath(responseProfileImageDTO.getDirPath());
             }
             profileImageRepository.save(findProfile);
-
 
 
         } catch (IOException e) {
@@ -243,8 +250,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean checkPassowrd(CheckPasswordDTO checkPasswordDTO) {
         /* 설명. DB에 있는 해당 회원의 정보 */
-        Member member =  memberRepository.findById(checkPasswordDTO.getId()).orElse(null);
-        if(member == null || !passwordEncoder.matches(checkPasswordDTO.getPassword(), member.getPw())){
+        Member member = memberRepository.findById(checkPasswordDTO.getId()).orElse(null);
+        if (member == null || !passwordEncoder.matches(checkPasswordDTO.getPassword(), member.getPw())) {
             return false;
         }
 
@@ -253,9 +260,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public boolean modifyPassword(ModifyPasswordDTO modifyPasswordDTO) {
-        Member member =  memberRepository.findById(modifyPasswordDTO.getId()).orElse(null);
+        Member member = memberRepository.findById(modifyPasswordDTO.getId()).orElse(null);
 
-        if(member == null || !passwordEncoder.matches(modifyPasswordDTO.getOldPassword(), member.getPw())){
+        if (member == null || !passwordEncoder.matches(modifyPasswordDTO.getOldPassword(), member.getPw())) {
             return false;
         }
         // BCrypt 암호화
@@ -268,13 +275,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
+
     // 회원 가입 제한 사항 확인, 이메일 중복, 이미 가입한 회원, 블랙리스트 등등
     private ResponseSignUpDTO checkBeforeSignUp(RequestMemberDTO memberDTO) throws IllegalArgumentException {
 
         ResponseSignUpDTO responseSignUpDTO = new ResponseSignUpDTO();
         // 중복된 email 혹은 이미 가입된 회원이 있는지조회(이미 가입된 회원 조건은 이름 && 생일이 같은 사람이있는지로 판단)
-        Member findMember
+        List<Member> findMembers
                 = memberRepository.findByEmailOrNameAndBirth(memberDTO.getEmail(), memberDTO.getName(), memberDTO.getBirth());
+
+        Member findMember = null;
+        if (findMembers.size() > 0) findMember = findMembers.get(0);
+//                = memberRepository.findByEmailOrNameAndBirth(memberDTO.getEmail(), memberDTO.getName(), memberDTO.getBirth());
 
         List<AuthorityList> authorityList
                 = authorityRepository.findAll().stream()
@@ -285,6 +297,9 @@ public class MemberServiceImpl implements MemberService {
             //중복 이메일이 있는지 확인
             if (findMember.getEmail().equals(memberDTO.getEmail())) {
                 responseSignUpDTO.setDuplicateEmail(true);
+                return responseSignUpDTO;
+            } else if (findMember.getName().equals(memberDTO.getName())) {
+                responseSignUpDTO.setExistingMember(true);
                 return responseSignUpDTO;
             }
 
@@ -298,17 +313,19 @@ public class MemberServiceImpl implements MemberService {
                     return responseSignUpDTO;
                 }
 
-                responseSignUpDTO.setExistingMember(true);
-                return responseSignUpDTO;
             }
 
         } else {
             try {
+
                 Member member = modelMapper.map(memberDTO, Member.class);
                 member.setStatus(1L); //회원 상태 정상 상태로 초기 셋팅
                 member.setLevel(1L); //회원 상태 정상 상태로 초기 셋팅
                 member.setCreatedAt(LocalDateTime.now());
                 member = memberRepository.save(member);
+
+                calculatePoint(member, 2);
+
                 responseSignUpDTO.setMemberDTO(modelMapper.map(member, ResponseMemberDTO.class));
 
                 //기본 Member 권한 부여
@@ -319,6 +336,58 @@ public class MemberServiceImpl implements MemberService {
         }
 
         return responseSignUpDTO;
+    }
+
+
+    @Override
+    public void calculatePoint(Long member_id, int id) {
+        Member member = memberRepository.findById(member_id).orElse(null);
+
+        calculatePoint(member, id);
+    }
+
+    // 포인트 연산
+    private void calculatePoint(Member member, int id) {
+
+        BaseOfPoint baseOfPoint = baseOfPointRepository.findById(id).orElse(null);
+
+        if (baseOfPoint != null) {
+            int point = baseOfPoint.getPoint();
+            //로그인시 포인트
+            if (baseOfPoint.getId() == 1) {
+                LocalDate today = LocalDate.now();
+                LocalDateTime startOfDay = today.atStartOfDay();           // 2025-11-10 00:00:00
+                LocalDateTime endOfDay   = today.plusDays(1).atStartOfDay(); // 2025-11-11 00:00:00
+                List<LoginHistory> loginHistories =
+                        loginHistoryRepository.findLoginHistory(startOfDay,endOfDay, member.getId());
+
+                //당일 첫 로그인시만 포인트 흭득
+                if(loginHistories.size() == 0) {
+                    // 포인트 흭득 기록
+                    Point pointHistroy = new Point();
+                    pointHistroy.setPoint(point);
+                    pointHistroy.setMemberId(member.getId());
+                    pointHistroy.setDistinction(Point.Distinction.EARN);
+
+                    pointRepository.save(pointHistroy);
+                    member.setPoint(member.getPoint() + point);
+                    memberRepository.save(member);
+                }
+            } else if (baseOfPoint.getId() == 2) { // 회원가입시 포인트
+                member.setPoint(point);
+
+                // 포인트 흭득 기록
+                Point pointHistroy = new Point();
+                pointHistroy.setPoint(point);
+                pointHistroy.setMemberId(member.getId());
+                pointHistroy.setDistinction(Point.Distinction.EARN);
+
+                pointRepository.save(pointHistroy);
+                memberRepository.save(member);
+            }
+
+        }
+
     }
 
 

@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ExtendFilePath {
+public class FoodExtendFilePath {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

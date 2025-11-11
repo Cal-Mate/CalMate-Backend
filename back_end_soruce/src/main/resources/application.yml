@@ -78,3 +78,6 @@ mybatis:
 # 프로필 이지미 관련 경로
 profile:
   dirPath: /img/profile/
+
+mybatis:
+  mapper-locations: classpath*:com/ateam/calmate/**/mapper/*Mapper.xml

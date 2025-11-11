@@ -1,8 +1,13 @@
 package com.ateam.calmate.security;
 
+import com.ateam.calmate.common.ResponseMessage;
+import com.ateam.calmate.member.command.dto.ResoponseLoginDTO;
 import com.ateam.calmate.member.command.dto.UserImpl;
+import com.ateam.calmate.member.command.entity.Member;
 import com.ateam.calmate.member.command.entity.UploadFile;
 import com.ateam.calmate.member.command.repository.ProfileImageRepository;
+import com.ateam.calmate.member.command.service.MemberService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,10 +27,14 @@ import java.util.stream.Collectors;
 @Component
 public class JsonAuthSuccessHandler implements AuthenticationSuccessHandler {
     private final ProfileImageRepository profileImageRepository;
+    private final MemberService memberService;
 
     @Autowired
-    public JsonAuthSuccessHandler(ProfileImageRepository profileImageRepository){
+    public JsonAuthSuccessHandler(
+            ProfileImageRepository profileImageRepository
+            ,MemberService memberService){
         this.profileImageRepository = profileImageRepository;
+        this.memberService = memberService;
     }
 
     @Override
@@ -57,7 +67,6 @@ public class JsonAuthSuccessHandler implements AuthenticationSuccessHandler {
             profilePath =  requestPath + profilePath.substring(index,profilePath.length());
         }
 
-
         // 추가 필드 예시(원하면 req에 Attribute로 담아 오거나, DB 조회해서 채우기)
         Map<String, Object> extra = Map.of(
                 "loginAt", LocalDateTime.now().toString(),
@@ -69,36 +78,26 @@ public class JsonAuthSuccessHandler implements AuthenticationSuccessHandler {
         res.setStatus(status);
         res.setContentType("application/json;charset=UTF-8");
 
-        StringBuilder sb = new StringBuilder()
-                .append("{\"success\":true")
-                .append(",\"code\":\"").append(code).append("\"")
-                .append(",\"message\":\"").append(escapeJson(message)).append("\"")
-                .append(",\"user\":{")
-                .append("\"userId\":\"").append(escapeJson(id.toString())).append("\",")
-                .append("\"userName\":\"").append(escapeJson(userName)).append("\",")
-                .append("\"nickname\":\"").append(escapeJson(user.getNickName())).append("\",")
-                .append("\"bodyMetric\":\"").append(escapeJson(user.getBodyMetric().toString())).append("\",")
-                .append("\"weight\":\"").append(escapeJson(user.getWeight().toString())).append("\",")
-                .append("\"height\":\"").append(escapeJson(user.getHeight().toString())).append("\",")
-                .append("\"userEmail\":\"").append(escapeJson(userEmail)).append("\",")
-                .append("\"profilePath\":\"").append(escapeJson(profilePath)).append("\",")
-                .append("\"authorities\":").append(toJsonArray(authorities))
-                .append("}");
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setHttpStatus(status);
+        responseMessage.setMessage(message);
 
-        if (!extra.isEmpty()) {
-            sb.append(",\"extra\":{");
-            boolean first = true;
-            for (var e : extra.entrySet()) {
-                if (!first) sb.append(',');
-                first = false;
-                sb.append('"').append(escapeJson(e.getKey())).append("\":\"")
-                        .append(escapeJson(String.valueOf(e.getValue()))).append('"');
-            }
-            sb.append('}');
-        }
+        ResoponseLoginDTO resoponseLoginDTO = new ResoponseLoginDTO(
+                id, userName, user.getNickName(), user.getBodyMetric(),
+                user.getWeight(), user.getHeight(), user.getGender(),
+                user.getBirth(), userEmail, profilePath, user.getPhone(),
+                authorities
+        );
+        Map<String , Object> bodyPayload =  new HashMap<>();
+        bodyPayload.put("user", resoponseLoginDTO);
+        bodyPayload.put("extra", extra);
 
-        sb.append('}');
-        res.getWriter().write(sb.toString());
+        responseMessage.setResult(bodyPayload);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(responseMessage);
+        res.getWriter().write(json);
+
     }
 
     private List<String> toAuthorityList(Collection<? extends GrantedAuthority> authorities) {

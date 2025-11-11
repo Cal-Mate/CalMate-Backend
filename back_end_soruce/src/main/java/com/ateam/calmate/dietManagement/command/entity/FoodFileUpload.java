@@ -58,7 +58,7 @@ public class FoodFileUpload {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "extend_file_path_id", nullable = false)
-    private ExtendFilePath extendFilePath;
+    private FoodExtendFilePath extendFilePath;
 
     @PrePersist
     void onCreate() {

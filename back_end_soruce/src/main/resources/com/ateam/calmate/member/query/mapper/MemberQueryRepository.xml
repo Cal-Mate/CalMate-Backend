@@ -12,7 +12,9 @@
         <result property="memberName" column="name"/>
         <result property="memStsId" column="status"/>
         <result property="nickName" column="nickname"/>
+        <result property="phone" column="phone"/>
         <result property="birth" column="birth"/>
+        <result property="gender" column="gender"/>
         <result property="loginLockUntil" column="login_lock_until"/>
         <result property="loginFailCnt" column="login_failure_count"/>
         <result property="pwd" column="pw"/>
@@ -27,6 +29,12 @@
         </collection>
     </resultMap>
 
+    <resultMap id="blackListResultMap" type="com.ateam.calmate.member.query.dto.BlackListDTO">
+        <id property="memberId" column="member_id"/>
+        <result property="createDate" column="create_date"/>
+        <result property="adminId" column="admin_id"/>
+    </resultMap>
+
     <select id="selectByIdWithAuthorite" parameterType="string" resultMap="selectByIdWithAuthoritiesResultMap">
         SELECT
                a.id
@@ -38,8 +46,10 @@
              , a.pw
              , a.login_failure_count
              , a.login_lock_until
+             , a.phone
              , a.height
              , a.weight
+             , a.gender
              , a.body_metric
              , b.member_id
              , b.authories_id
@@ -50,5 +60,17 @@
           JOIN authorites c on b.authories_id = c.id
          WHERE a.email = #{email}
     </select>
+
+
+
+    <select id="selectBlackListByMember" parameterType="_long" resultMap="blackListResultMap">
+        SELECT
+               a.member_id
+             , a.create_date
+             , a.admin_id
+        FROM black_list a
+        WHERE a.member_id = #{id}
+    </select>
+
 
 </mapper>

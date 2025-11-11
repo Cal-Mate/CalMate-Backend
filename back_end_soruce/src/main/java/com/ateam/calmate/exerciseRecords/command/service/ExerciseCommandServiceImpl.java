@@ -2,7 +2,9 @@ package com.ateam.calmate.exerciseRecords.command.service;
 
 import com.ateam.calmate.exerciseRecords.command.dto.ExerciseRequest;
 import com.ateam.calmate.exerciseRecords.command.entity.Exercise;
+import com.ateam.calmate.exerciseRecords.command.entity.ExerciseExtendFilePath;
 import com.ateam.calmate.exerciseRecords.command.entity.ExerciseFileUpload;
+import com.ateam.calmate.exerciseRecords.command.repository.ExerciseExtendFilePathRepository;
 import com.ateam.calmate.exerciseRecords.command.repository.ExerciseFileUploadRepository;
 import com.ateam.calmate.exerciseRecords.command.repository.ExerciseRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.*;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,126 +26,112 @@ import java.util.UUID;
 public class ExerciseCommandServiceImpl implements ExerciseCommandService {
 
     private final ExerciseRepository exerciseRepository;
-    private final ExerciseFileUploadRepository fileUploadRepository;
+    private final ExerciseFileUploadRepository fileRepository;
+    private final ExerciseExtendFilePathRepository extendPathRepository;
 
-    // 프로젝트 루트 기준으로 uploads/exercise 밑에 저장
-    private final String uploadRootDir = "uploads/exercise";
+    private final Path exerciseRootDir =
+            Paths.get(System.getProperty("user.dir"), "img", "exercise");
 
     @Override
-    public Long createExercise(ExerciseRequest request, List<MultipartFile> files) {
-        Exercise exercise = Exercise.builder()
-                .date(request.getDate())
-                .type(request.getType())
-                .category(request.getCategory())
-                .min(request.getMin())
-                .burnedKcal(request.getBurnedKcal())
-                .memberId(request.getMemberId())
-                .build();
-
-        exerciseRepository.save(exercise);
+    public Long createExercise(ExerciseRequest request, List<MultipartFile> files) throws IOException {
+        Exercise exercise = exerciseRepository.save(request.toEntity());
 
         if (files != null && !files.isEmpty()) {
-            int order = 1;
-            for (MultipartFile file : files) {
-                if (file.isEmpty()) {
-                    continue;
-                }
-                saveFile(exercise, file, order++);
-            }
+            saveFiles(files, exercise);
         }
 
         return exercise.getId();
     }
 
     @Override
-    public void updateExercise(Long id, ExerciseRequest request, List<MultipartFile> files) {
+    public void updateExercise(Long id, ExerciseRequest request, List<MultipartFile> files) throws IOException {
         Exercise exercise = exerciseRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("exercise not found"));
+                .orElseThrow(() -> new IllegalArgumentException("해당 운동이 존재하지 않습니다."));
 
         exercise.setDate(request.getDate());
         exercise.setType(request.getType());
         exercise.setCategory(request.getCategory());
         exercise.setMin(request.getMin());
         exercise.setBurnedKcal(request.getBurnedKcal());
-        exercise.setMemberId(request.getMemberId());
 
-        if (files != null && !files.isEmpty()) {
-            deletePhysicalFiles(exercise);
-            List<ExerciseFileUpload> oldFiles = new ArrayList<>(exercise.getFiles());
-            for (ExerciseFileUpload f : oldFiles) {
-                exercise.getFiles().remove(f);
-            }
+        List<ExerciseFileUpload> oldFiles = fileRepository.findByExerciseId(id);
+        List<Long> keepIds = request.getKeepFileIds() != null
+                ? request.getKeepFileIds()
+                : Collections.emptyList();
 
-            int order = 1;
-            for (MultipartFile file : files) {
-                if (file.isEmpty()) continue;
-                saveFile(exercise, file, order++);
+        for (ExerciseFileUpload f : oldFiles) {
+            if (!keepIds.contains(f.getId())) {
+                deletePhysicalFile(f);
+                fileRepository.delete(f);
             }
         }
-    }
 
+        if (files != null && !files.isEmpty()) {
+            saveFiles(files, exercise);
+        }
+    }
 
     @Override
     public void deleteExercise(Long id) {
         Exercise exercise = exerciseRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("exercise not found"));
+                .orElseThrow(() -> new IllegalArgumentException("해당 운동이 존재하지 않습니다."));
 
-        deletePhysicalFiles(exercise);
+        List<ExerciseFileUpload> oldFiles = fileRepository.findByExerciseId(id);
+        for (ExerciseFileUpload f : oldFiles) {
+            deletePhysicalFile(f);
+        }
+
         exerciseRepository.delete(exercise);
     }
 
+    private void saveFiles(List<MultipartFile> files, Exercise exercise) throws IOException {
+        Files.createDirectories(exerciseRootDir);
 
-    private void saveFile(Exercise exercise, MultipartFile file, int order) {
-        try {
-            String originalName = file.getOriginalFilename();
+        ExerciseExtendFilePath extend = extendPathRepository.findByUrlPath("/img/exercise/")
+                .orElseGet(() -> extendPathRepository.save(
+                        ExerciseExtendFilePath.builder()
+                                .urlPath("/img/exercise/")
+                                .build()
+                ));
+
+        int startOrder = fileRepository.findByExerciseId(exercise.getId()).size() + 1;
+
+        for (int i = 0; i < files.size(); i++) {
+            MultipartFile file = files.get(i);
+            if (file.isEmpty()) continue;
+
+            String originalName = StringUtils.cleanPath(file.getOriginalFilename());
             String ext = StringUtils.getFilenameExtension(originalName);
-            String storeName = UUID.randomUUID() + (ext != null ? "." + ext : "");
+            String reName = UUID.randomUUID() + (ext != null ? "." + ext : "");
 
-            // uploads/exercise/{exerciseId}
-            Path root = Paths.get(uploadRootDir).toAbsolutePath().normalize();
-            Path dir = root.resolve(String.valueOf(exercise.getId()));
-
-            // 디렉터리 생성
-            Files.createDirectories(dir);
-
-            // 실제 저장 경로
-            Path filePath = dir.resolve(storeName);
-            file.transferTo(filePath.toFile());
+            Path savePath = exerciseRootDir.resolve(reName);
+            file.transferTo(savePath.toFile());
 
             ExerciseFileUpload upload = ExerciseFileUpload.builder()
                     .exercise(exercise)
                     .name(originalName)
                     .type(file.getContentType())
-                    .reName(storeName)
-                    .path(dir.toString())  // 디렉터리 경로 저장
-                    .uploadOrder(order)
+                    .reName(reName)
+                    .path("")
+                    .thumbPath("")
+                    .uploadOrder(startOrder + i)
+                    .createAt(LocalDateTime.now())
+                    .extendFilePath(extend)
                     .build();
 
             exercise.addFile(upload);
-            fileUploadRepository.save(upload);
-        } catch (Exception e) {
-            // 여기서 실제 예외 메시지 찍히면 원인 파악 가능
-            e.printStackTrace();
-            throw new RuntimeException("file save error: " + e.getMessage(), e);
+            fileRepository.save(upload);
         }
     }
 
-    private void deletePhysicalFiles(Exercise exercise) {
-        if (exercise.getFiles() == null || exercise.getFiles().isEmpty()) {
-            return;
-        }
+    private void deletePhysicalFile(ExerciseFileUpload f) {
+        if (f.getReName() == null || f.getReName().isEmpty()) return;
 
-        for (ExerciseFileUpload f : exercise.getFiles()) {
-            try {
-                if (f.getPath() == null || f.getReName() == null) {
-                    continue;
-                }
-                Path path = Paths.get(f.getPath(), f.getReName());
-                Files.deleteIfExists(path);
-            } catch (Exception e) {
-                // 삭제 실패해도 서비스 전체가 죽지 않게 예외만 로그
-                e.printStackTrace();
-            }
+        try {
+            Path filePath = exerciseRootDir.resolve(f.getReName());
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
