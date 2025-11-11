@@ -1,20 +1,7 @@
 package com.ateam.calmate.exerciseRecords.command.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -41,10 +28,10 @@ public class ExerciseFileUpload {
     private String reName;
 
     @Column(length = 255)
-    private String path;
+    private String path;          // 지금은 안 써도 됨
 
     @Column(name = "thumb_path", length = 255)
-    private String thumbPath;
+    private String thumbPath;     // 지금은 안 써도 됨
 
     @Column(name = "upload_order")
     private Integer uploadOrder;
@@ -55,6 +42,10 @@ public class ExerciseFileUpload {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_id", nullable = false)
     private Exercise exercise;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "extend_file_path_id")
+    private ExerciseExtendFilePath extendFilePath;
 
     @PrePersist
     void onCreate() {

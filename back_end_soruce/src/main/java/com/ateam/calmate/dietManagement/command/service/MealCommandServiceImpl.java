@@ -2,11 +2,11 @@ package com.ateam.calmate.dietManagement.command.service;
 
 import com.ateam.calmate.dietManagement.command.dto.FoodRequest;
 import com.ateam.calmate.dietManagement.command.dto.MealRequest;
-import com.ateam.calmate.dietManagement.command.entity.ExtendFilePath;
+import com.ateam.calmate.dietManagement.command.entity.FoodExtendFilePath;
 import com.ateam.calmate.dietManagement.command.entity.Food;
 import com.ateam.calmate.dietManagement.command.entity.FoodFileUpload;
 import com.ateam.calmate.dietManagement.command.entity.Meal;
-import com.ateam.calmate.dietManagement.command.repository.ExtendFilePathRepository;
+import com.ateam.calmate.dietManagement.command.repository.FoodExtendFilePathRepository;
 import com.ateam.calmate.dietManagement.command.repository.FoodFileUploadRepository;
 import com.ateam.calmate.dietManagement.command.repository.FoodRepository;
 import com.ateam.calmate.dietManagement.command.repository.MealRepository;
@@ -32,10 +32,10 @@ public class MealCommandServiceImpl implements MealCommandService {
     private final MealRepository mealRepository;
     private final FoodRepository foodRepository;
     private final FoodFileUploadRepository fileUploadRepository;
-    private final ExtendFilePathRepository extendFilePathRepository;
+    private final FoodExtendFilePathRepository extendFilePathRepository;
 
-    // 프로젝트 루트 기준 상대 경로
-    private final String uploadRootDir = "uploads/meal";
+    // 이제 실제 저장 위치: {projectRoot}/img/meal
+    private final String uploadRootDir = "img/meal";
 
     @Override
     public Long createMeal(MealRequest request, List<MultipartFile> files) {
@@ -155,27 +155,25 @@ public class MealCommandServiceImpl implements MealCommandService {
             String ext = StringUtils.getFilenameExtension(originalName);
             String storeName = UUID.randomUUID() + (ext != null ? "." + ext : "");
 
-            // 실제 저장 경로: {projectRoot}/uploads/meal/{mealId}/
+            // 실제 저장 경로: {projectRoot}/img/meal/
             Path root = Paths.get(uploadRootDir).toAbsolutePath().normalize();
-            Path dir = root.resolve(String.valueOf(meal.getId()));
-            Files.createDirectories(dir);
+            Files.createDirectories(root);
 
-            Path filePath = dir.resolve(storeName);
+            Path filePath = root.resolve(storeName);
             file.transferTo(filePath.toFile());
 
-            // url_path: /img/meal/{mealId}/
-            ExtendFilePath extendFilePath = ExtendFilePath.builder()
-                    .urlPath("/img/meal/" + meal.getId() + "/")
+            // url_path: /img/meal/
+            FoodExtendFilePath extendFilePath = FoodExtendFilePath.builder()
+                    .urlPath("/img/meal/")
                     .build();
             extendFilePathRepository.save(extendFilePath);
 
-            // DB path 에는 mealId 만 저장 (삭제용)
             FoodFileUpload upload = FoodFileUpload.builder()
                     .meal(meal)
                     .name(originalName)
                     .type(file.getContentType())
-                    .reName(storeName)
-                    .path(String.valueOf(meal.getId()))
+                    .reName(storeName)   // 파일명만 저장
+                    .path("")            // 이제 하위 폴더 안 씀
                     .thumbPath("")
                     .uploadOrder(order)
                     .extendFilePath(extendFilePath)
@@ -190,13 +188,11 @@ public class MealCommandServiceImpl implements MealCommandService {
 
     private void deletePhysicalFile(FoodFileUpload f) {
         try {
-            if (f.getPath() == null || f.getReName() == null) {
+            if (f.getReName() == null) {
                 return;
             }
             Path root = Paths.get(uploadRootDir).toAbsolutePath().normalize();
-            Path filePath = root
-                    .resolve(f.getPath())       // mealId
-                    .resolve(f.getReName());    // uuid.xxx
+            Path filePath = root.resolve(f.getReName());   // 바로 img/meal/파일명
             Files.deleteIfExists(filePath);
         } catch (Exception e) {
             e.printStackTrace();
