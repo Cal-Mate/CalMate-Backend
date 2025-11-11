@@ -39,7 +39,18 @@ public class WebConfig implements WebMvcConfigurer {
 
         // (선택) 식단 업로드 전용 경로 (프론트에서 /uploads/meal/ 쓰면 명시)
         registry.addResourceHandler("/uploads/meal/**")
-                .addResourceLocations("file:" + baseDir + "/uploads/meal/");
+                .addResourceLocations(
+                        "file:" + baseDir + "/uploads/meal/",
+                        "file:" + System.getProperty("user.dir") + "/img/meal/");
+
+        registry.addResourceHandler("/img/exercise/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/exercise/");
+
+        // (게시판 이미지, 식단 업로드 이미지, exercise 등)
+        registry.addResourceHandler("/img/community/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/community/");
+
+
     }
 
     @Override

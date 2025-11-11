@@ -13,10 +13,10 @@
     </resultMap>
     <select id="selectMemberSituation" resultMap="memberSituation">
         SELECT
-               sum(case when status = 1 then 1 else 0 end) as active_member,
-              ,sum(case when status = 3 then 1 else 0 end) as stoped_member,
-              ,sum(case when status = 5 then 1 else 0 end) as blocked_member,
-              ,sum(case when status = 1 and created_at >= DATE_ADD(curdate(), interval -7 day) then 1 else 0 end ) as new_member,
+               sum(case when status = 1 then 1 else 0 end) as active_member
+              ,sum(case when status = 3 then 1 else 0 end) as stoped_member
+              ,sum(case when status = 5 then 1 else 0 end) as blocked_member
+              ,sum(case when status = 1 and created_at >= DATE_ADD(curdate(), interval -7 day) then 1 else 0 end ) as new_member
               ,count(*) as total_member
         FROM member;
     </select>

@@ -5,9 +5,9 @@ spring:
     name: member-client
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/calmate?&rewriteBatchedStatements=true
-    username: root
-    password: mariadb
+    url: jdbc:mariadb://localhost:3306/project_4st
+    username: swcamp
+    password: swcamp
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
