@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS post_file (
     state   VARCHAR(255)   NULL,
     re_name   VARCHAR(255)   NULL,
     post_id   INT   NOT NULL,
-    extend_file_path_id   INT   NOT NULL,
+    extend_file_path_id   BIGINT   NOT NULL,
     PRIMARY KEY (id)
     ) ENGINE=InnoDB;
 
@@ -640,43 +640,30 @@ SET FOREIGN_KEY_CHECKS = 1;
 ALTER TABLE post add CONSTRAINT fk_post_member FOREIGN KEY (member_id) REFERENCES member(id);
 ALTER TABLE post add CONSTRAINT fk_post_tag FOREIGN KEY (tag_id) REFERENCES tag(id);
 
-ALTER TABLE post_like add CONSTRAINT fk_postlike_post FOREIGN KEY (post_id) REFERENCES post(id);
+ALTER TABLE post_like add CONSTRAINT fk_postlike_post FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE;
 ALTER TABLE post_like add CONSTRAINT fk_postlike_member FOREIGN KEY (member_id) REFERENCES member(id);
 ALTER TABLE post_like add CONSTRAINT uq_post_like UNIQUE (post_id, member_id);
-ALTER TABLE post_like
-DROP FOREIGN KEY fk_post_like_post_id;
-
-ALTER TABLE post_like
-    ADD CONSTRAINT fk_post_like_post_id
-        FOREIGN KEY (post_id) REFERENCES post(id)
-            ON DELETE CASCADE;
 
 
-ALTER TABLE post_comment add CONSTRAINT fk_comment_post FOREIGN KEY (post_id) REFERENCES post(id);
+
+ALTER TABLE post_comment add CONSTRAINT fk_comment_post FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE;
 ALTER TABLE post_comment add CONSTRAINT fk_comment_member FOREIGN KEY (member_id) REFERENCES member(id);
-ALTER TABLE post_comment add CONSTRAINT fk_comment_parent FOREIGN KEY (member_parent_comment_id) REFERENCES post_comment(id);
-ALTER TABLE post_comment
-DROP FOREIGN KEY fk_post_comment_post_id;
+ALTER TABLE post_comment add CONSTRAINT fk_comment_parent FOREIGN KEY (member_parent_comment_id) REFERENCES post_comment(id) ON DELETE CASCADE;
 
-ALTER TABLE post_comment
-    ADD CONSTRAINT fk_post_comment_post_id
-        FOREIGN KEY (post_id) REFERENCES post(id)
-            ON DELETE CASCADE;
 
-ALTER TABLE comment_like add CONSTRAINT fk_cmtlike_comment FOREIGN KEY (post_comment_id) REFERENCES post_comment(id);
+
+ALTER TABLE comment_like add CONSTRAINT fk_cmtlike_comment FOREIGN KEY (post_comment_id) REFERENCES post_comment(id) ON DELETE CASCADE;
 ALTER TABLE comment_like add CONSTRAINT fk_cmtlike_member FOREIGN KEY (member_id) REFERENCES member(id);
 ALTER TABLE comment_like add CONSTRAINT uq_comment_like UNIQUE (post_comment_id, member_id);
 
-ALTER TABLE post_file add CONSTRAINT fk_postfile_post FOREIGN KEY (post_id) REFERENCES post(id);
+ALTER TABLE post_file add CONSTRAINT fk_postfile_post FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE;
 ALTER TABLE post_file
-DROP FOREIGN KEY fk_post_file_post_id;
-
-ALTER TABLE post_file
-    ADD CONSTRAINT fk_post_file_post_id
-        FOREIGN KEY (post_id) REFERENCES post(id)
+    ADD CONSTRAINT fk_postfile_extend_path
+        FOREIGN KEY (extend_file_path_id)
+            REFERENCES extend_file_path(id)
             ON DELETE CASCADE;
 
-ALTER TABLE post_tag add CONSTRAINT fk_posttag_post FOREIGN KEY (post_id) REFERENCES post(id);
+ALTER TABLE post_tag add CONSTRAINT fk_posttag_post FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE;;
 
 alter table upload_file add constraint fk_upload_file_member  foreign key(member_id)  references member(id);
 alter table upload_file add constraint fk_upload_file_extend_file_path  foreign key(extend_file_path_id)  references extend_file_path(id);
@@ -964,22 +951,6 @@ INSERT INTO comment_like (post_comment_id, member_id) VALUES
                                                           (8, 4),
                                                           (9, 3);
 
-
-INSERT INTO post_file (name, url, mime_type, path, state, re_name, post_id,extend_file_path_id)
-VALUES
-    ('post1.jpg', '/upload/post1.jpg', 'image/jpeg', '/var/upload/post1.jpg', 'ACTIVE', 'p1.jpg', 1,5),
-    ('post2.jpg', '/upload/post2.jpg', 'image/jpeg', '/var/upload/post2.jpg', 'ACTIVE', 'p2.jpg', 2,6),
-    ('post3.jpg', '/upload/post3.jpg', 'image/jpeg', '/var/upload/post3.jpg', 'ACTIVE', 'p3.jpg', 3,7),
-    ('post4.jpg', '/upload/post4.jpg', 'image/jpeg', '/var/upload/post4.jpg', 'ACTIVE', 'p4.jpg', 4,8),
-    ('post5.jpg', '/upload/post5.jpg', 'image/jpeg', '/var/upload/post5.jpg', 'ACTIVE', 'p5.jpg', 5,9),
-    ('post6.jpg', '/upload/post6.jpg', 'image/jpeg', '/var/upload/post6.jpg', 'ACTIVE', 'p6.jpg', 6,11),
-    ('post7.jpg', '/upload/post7.jpg', 'image/jpeg', '/var/upload/post7.jpg', 'ACTIVE', 'p7.jpg', 7,12),
-    ('post8.jpg', '/upload/post8.jpg', 'image/jpeg', '/var/upload/post8.jpg', 'ACTIVE', 'p8.jpg', 8,16),
-    ('post9.jpg', '/upload/post9.jpg', 'image/jpeg', '/var/upload/post9.jpg', 'ACTIVE', 'p9.jpg', 9,17),
-    ('post10.jpg', '/upload/post10.jpg', 'image/jpeg', '/var/upload/post10.jpg', 'ACTIVE', 'p10.jpg', 10,18);
-
-
-
 INSERT INTO extend_file_path (url_path) VALUES
                                             ('http://192.168.0.1:8080/upload/1'),
                                             ('http://192.168.0.1:8080/upload/2'),
@@ -1010,6 +981,22 @@ INSERT INTO extend_file_path (url_path) VALUES
                                             ('http://192.168.0.1:8080/upload/27'),
                                             ('http://192.168.0.1:8080/upload/28'),
                                             ('http://192.168.0.1:8080/upload/29');
+
+
+
+INSERT INTO post_file (name, url, mime_type, path, state, re_name, post_id,extend_file_path_id)
+VALUES
+    ('post1.jpg', '/img/community/post1.jpg', 'image/jpeg', '/upload/post1.jpg', 'ACTIVE', 'p1.jpg', 1,1),
+    ('post2.jpg', '/img/community/post2.jpg', 'image/jpeg', '/upload/post2.jpg', 'ACTIVE', 'p2.jpg', 2,2),
+    ('post3.jpg', '/img/community/post3.jpg', 'image/jpeg', '/upload/post3.jpg', 'ACTIVE', 'p3.jpg', 3,3),
+    ('post4.jpg', '/img/community/post4.jpg', 'image/jpeg', '/upload/post4.jpg', 'ACTIVE', 'p4.jpg', 4,4),
+    ('post5.jpg', '/img/community/post5.jpg', 'image/jpeg', '/upload/post5.jpg', 'ACTIVE', 'p5.jpg', 5,5),
+    ('post6.jpg', '/img/community/post6.jpg', 'image/jpeg', '/upload/post6.jpg', 'ACTIVE', 'p6.jpg', 6,6),
+    ('post7.jpg', '/img/community/post7.jpg', 'image/jpeg', '/upload/post7.jpg', 'ACTIVE', 'p7.jpg', 7,7),
+    ('post8.jpg', '/img/community/post8.jpg', 'image/jpeg', '/upload/post8.jpg', 'ACTIVE', 'p8.jpg', 8,8),
+    ('post9.jpg', '/img/community/post9.jpg', 'image/jpeg', '/upload/post9.jpg', 'ACTIVE', 'p9.jpg', 9,9),
+    ('post10.jpg', '/img/community/post10.jpg', 'image/jpeg', '/upload/post10.jpg', 'ACTIVE', 'p10.jpg', 10,10);
+
 
 
 

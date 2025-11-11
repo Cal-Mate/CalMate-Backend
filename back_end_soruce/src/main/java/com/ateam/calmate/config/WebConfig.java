@@ -29,20 +29,11 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/img/exercise/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/exercise/");
-    }
 
+        // (게시판 이미지, 식단 업로드 이미지, exercise 등)
+        registry.addResourceHandler("/img/community/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/community/");
 
-        // 운동 기본 이미지
-        registry.addResourceHandler("/img/exercise/**")
-                .addResourceLocations("file:" + baseDir + "/img/exercise/");
-
-        // 공통 업로드 파일
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + baseDir + "/uploads/");
-
-        // (필요하면) 식단 업로드 개별 매핑
-        registry.addResourceHandler("/uploads/meal/**")
-                .addResourceLocations("file:" + baseDir + "/uploads/meal/");
     }
 
     @Override
