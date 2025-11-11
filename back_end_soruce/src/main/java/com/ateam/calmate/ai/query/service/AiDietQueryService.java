@@ -2,7 +2,6 @@ package com.ateam.calmate.ai.query.service;
 
 import com.ateam.calmate.ai.command.dto.GoalType;
 import com.ateam.calmate.ai.query.dto.GoalQueryDTO;
-import com.ateam.calmate.ai.query.mapper.AiDietMapper;
 import com.ateam.calmate.ai.query.mapper.GoalQueryMapper;
 import com.ateam.calmate.ai.query.mapper.AllergyQueryMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,15 +15,12 @@ import java.util.List;
 @Service
 @Slf4j
 public class AiDietQueryService {
-    private final AiDietMapper aiDietMapper;
     private final GoalQueryMapper goalQueryMapper;
     private final AllergyQueryMapper allergyQueryMapper;
 
     @Autowired
-    public AiDietQueryService(AiDietMapper aiDietMapper,
-                              GoalQueryMapper goalQueryMapper,
+    public AiDietQueryService(GoalQueryMapper goalQueryMapper,
                               AllergyQueryMapper allergyQueryMapper) {
-        this.aiDietMapper = aiDietMapper;
         this.goalQueryMapper = goalQueryMapper;
         this.allergyQueryMapper = allergyQueryMapper;
     }

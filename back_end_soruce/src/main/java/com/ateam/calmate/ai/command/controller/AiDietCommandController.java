@@ -1,12 +1,12 @@
 package com.ateam.calmate.ai.command.controller;
 
+import com.ateam.calmate.ai.command.dto.AiResponseDTO;
 import com.ateam.calmate.ai.command.dto.RequestDietDTO;
 import com.ateam.calmate.ai.command.dto.ResponseDietDTO;
 import com.ateam.calmate.ai.command.service.AiDietCommandService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -23,10 +23,10 @@ public class AiDietCommandController {
     }
 
     @PostMapping("/diet")
-    public ResponseEntity<ResponseDietDTO> requestDiet(@RequestBody RequestDietDTO request) {
+    public ResponseEntity<AiResponseDTO> requestDiet(@RequestBody RequestDietDTO request) {
         log.info(request.toString());
-        ResponseDietDTO response = aiDietCommandService.getDietAndSave(request);
+        AiResponseDTO response = aiDietCommandService.getDietAndSave(request);
         log.info(response.toString());
-        return ResponseEntity.ok(null); // 오류나면 어떤 Response인지 알 수 있도록 수정해야함
+        return ResponseEntity.ok(response); // 오류나면 어떤 Response인지 알 수 있도록 수정해야함
     }
 }

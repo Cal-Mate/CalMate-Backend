@@ -5,11 +5,11 @@
 <mapper namespace="com.ateam.calmate.ai.query.mapper.AllergyQueryMapper">
     <select id="findMemberAllergyNames" parameterType="BigInteger" resultType="String">
         SELECT
-            a.allergy_name
+            a.name
         FROM
             member_allergy ma
                 JOIN
-            allergy a ON ma.allergy_id = a.allergy_id
+            allergy a ON ma.allergy_id = a.id
         WHERE
             ma.member_id = #{memberId}
     </select>
