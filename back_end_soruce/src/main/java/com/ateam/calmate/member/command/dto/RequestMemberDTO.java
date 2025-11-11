@@ -19,6 +19,7 @@ public class RequestMemberDTO {
     private String pw;
     private Double weight;
     private Double height;
+    private int bodyMetric;
     private String name;
     private LocalDate birth;
     private String gender;

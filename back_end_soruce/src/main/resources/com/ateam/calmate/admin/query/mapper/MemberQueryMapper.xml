@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ateam.calmate.admin.query.mapper.MemberQueryMapper">
+
+    <resultMap id="memberSituation" type="com.ateam.calmate.admin.query.dto.MemberSituationDTO">
+        <result property="activeMembers" column="active_member"/>
+        <result property="stopedMembers" column="stoped_member"/>
+        <result property="blockedMembers" column="blocked_member"/>
+        <result property="newMembers" column="new_member"/>
+        <result property="totalMembers" column="total_member"/>
+    </resultMap>
+    <select id="selectMemberSituation" resultMap="blackListResultMap">
+        SELECT
+               sum(case when status = 1 then 1 else 0 end) as active_member,
+              ,sum(case when status = 3 then 1 else 0 end) as stoped_member,
+              ,sum(case when status = 5 then 1 else 0 end) as blocked_member,
+              ,sum(case when status = 1 and created_at >= DATE_ADD(curdate(), interval -7 day) then 1 else 0 end ) as new_member,
+              ,count(*) as total_member
+        FROM member;
+    </select>
+
+
+</mapper>
