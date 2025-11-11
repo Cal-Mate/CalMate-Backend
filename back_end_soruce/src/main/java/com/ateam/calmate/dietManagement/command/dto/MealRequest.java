@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,4 +20,5 @@ public class MealRequest {
     private String type;
     private Long memberId;
     private FoodRequest food;
+    private List<Long> keepFileIds;
 }
