@@ -11,6 +11,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${profile.dirPath}")
     String profileDirPath;
 
+    @Value("${file.upload.base-path:back_end_soruce/img/event}")
+    String uploadBasePath;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/img/single/**")
@@ -21,6 +24,10 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/img/meal/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/meal/");
+
+        // 업로드된 파일 제공 (/uploads/ 경로로 접근)
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/" + uploadBasePath + "/");
     }
 
 

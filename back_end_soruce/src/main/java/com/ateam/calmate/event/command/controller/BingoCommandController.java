@@ -26,7 +26,7 @@ public class BingoCommandController {
             @PathVariable Integer cellId,
             @RequestParam Long memberId,
             @RequestParam(required = false) Long extendFilePathId,
-            @RequestPart("file") MultipartFile file
+            @RequestPart(value = "file", required = false) MultipartFile file
     ) throws Exception {
 
         // 현재 월 보드 자동 생성 및 반환
@@ -35,6 +35,11 @@ public class BingoCommandController {
 
         // 요청된 boardId가 현재 월 보드가 아니면 400 Bad Request 반환
         if (!ensuredBoard.getId().equals(boardId)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // 파일이 제공되지 않은 경우 400 Bad Request 반환
+        if (file == null || file.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 

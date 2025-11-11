@@ -1,4 +1,4 @@
-package com.ateam.calmate.event.controller.gacha;
+package com.ateam.calmate.event.command.controller;
 
 import com.ateam.calmate.event.command.service.gacha.GachaBoardCommandService;
 import com.ateam.calmate.event.query.dto.gacha.GachaDrawLogDTO;

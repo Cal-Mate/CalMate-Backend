@@ -103,7 +103,7 @@ public class BingoCommandServiceImpl implements BingoCommandService {
                 .newlyCompletedLineCount(progress.getCompletedLineCount())
                 .boardCompletedNow(progress.isCompleted())
                 .pointsGranted(points)
-                .uploadedPath(saved.relativePath())
+                .uploadedPath("/uploads/" + saved.relativePath())
                 .storedFileName(saved.storedFileName())
                 .build();
     }
