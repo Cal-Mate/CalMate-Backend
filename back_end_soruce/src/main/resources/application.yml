@@ -34,7 +34,7 @@ spring:
       max-request-size: 200MB      # 업로드 요청당 총 용량(default 10MB)
   web:
     resources:
-      static-locations: file:///C:/uploadFiles/     # 정적 리소스 경로
+      static-locations: file:./uploads/
       cache-period: 3600                            # 웹 브라우저의 캐싱 시간(초, 1시간)
 
 logging:

@@ -12,5 +12,7 @@ public class DiaryUpdateRequest {
     private String mood;
     private String condition;
     private String memo;
-    private List<DiaryFileRequest> files;
+
+    // 삭제할 파일 id 목록 (선택)
+    private List<Integer> deleteFileIds;
 }
