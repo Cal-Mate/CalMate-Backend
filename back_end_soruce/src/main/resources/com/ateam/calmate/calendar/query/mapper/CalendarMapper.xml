@@ -50,35 +50,6 @@
             LIMIT 1
     </select>
 
-    <select id="selectCalendarRangeByMember" resultMap="CalendarResultMap">
-        SELECT
-            c.id,
-            c.cal_day,
-            c.exercise_status,
-            c.meal_status,
-            c.diary_status,
-            c.badge_yn,
-            c.member_id
-        FROM calendar c
-        WHERE c.member_id = #{memberId}
-          AND c.cal_day BETWEEN #{startDate} AND #{endDate}
-        ORDER BY c.cal_day ASC
-    </select>
-
-    <select id="selectCalendarByDay" resultMap="CalendarResultMap">
-        SELECT
-            c.id,
-            c.cal_day,
-            c.exercise_status,
-            c.meal_status,
-            c.diary_status,
-            c.badge_yn,
-            c.member_id
-        FROM calendar c
-        WHERE c.member_id = #{memberId}
-          AND DATE(c.cal_day) = #{day}
-            LIMIT 1
-    </select>
 
     <select id="selectTotalBadgeCountByMember" resultType="int">
         SELECT COALESCE(SUM(c.badge_yn), 0)
