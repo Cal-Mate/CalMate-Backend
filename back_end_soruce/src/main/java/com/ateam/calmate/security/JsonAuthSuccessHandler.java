@@ -84,7 +84,8 @@ public class JsonAuthSuccessHandler implements AuthenticationSuccessHandler {
 
         ResoponseLoginDTO resoponseLoginDTO = new ResoponseLoginDTO(
                 id, userName, user.getNickName(), user.getBodyMetric(),
-                user.getWeight(), user.getHeight(), userEmail, profilePath,
+                user.getWeight(), user.getHeight(), user.getGender(),
+                user.getBirth(), userEmail, profilePath, user.getPhone(),
                 authorities
         );
         Map<String , Object> bodyPayload =  new HashMap<>();

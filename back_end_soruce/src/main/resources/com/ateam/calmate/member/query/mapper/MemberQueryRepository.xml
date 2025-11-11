@@ -12,7 +12,9 @@
         <result property="memberName" column="name"/>
         <result property="memStsId" column="status"/>
         <result property="nickName" column="nickname"/>
+        <result property="phone" column="phone"/>
         <result property="birth" column="birth"/>
+        <result property="gender" column="gender"/>
         <result property="loginLockUntil" column="login_lock_until"/>
         <result property="loginFailCnt" column="login_failure_count"/>
         <result property="pwd" column="pw"/>
@@ -44,8 +46,10 @@
              , a.pw
              , a.login_failure_count
              , a.login_lock_until
+             , a.phone
              , a.height
              , a.weight
+             , a.gender
              , a.body_metric
              , b.member_id
              , b.authories_id
@@ -67,5 +71,6 @@
         FROM black_list a
         WHERE a.member_id = #{id}
     </select>
+
 
 </mapper>

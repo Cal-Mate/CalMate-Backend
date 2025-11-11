@@ -16,7 +16,10 @@ public class ResoponseLoginDTO {
     private Integer bodyMetric;
     private Double weight;
     private Double height;
+    private String gender;
+    private String birth;
     private String userEmail;
     private String profilePath;
+    private String phone;
     private List<String> authorities;
 }
