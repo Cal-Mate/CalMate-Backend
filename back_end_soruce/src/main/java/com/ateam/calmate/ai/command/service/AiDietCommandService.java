@@ -13,6 +13,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +53,9 @@ public class AiDietCommandService {
                 AiResponseDTO.class // 응답받을 객체 타입
         );
 
+        // 오늘자 기존 데이터가 존재한다면 삭제
+        purgeTodayDiet(memberId);
+
         // ai_diet 테이블에 응답을 저장
         List<AiDietEntity> entitiesToSave = convertDtoToEntities(aiResponse, memberId);
         aiDietRepository.saveAll(entitiesToSave);
@@ -58,6 +64,22 @@ public class AiDietCommandService {
 
         // AiResponse 반환하기
         return aiResponse;
+    }
+
+    private void purgeTodayDiet(BigInteger memberId) {
+        ZoneId zone = ZoneId.of("Asia/Seoul");
+        LocalDate today = LocalDate.now(zone);
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay().minusNanos(1);
+
+        List<Integer> ids = aiDietQueryService.findTodayDietIds(memberId, start, end);
+
+        if (ids != null && !ids.isEmpty()) {
+            aiDietRepository.deleteAllByIdInBatch(ids);
+            log.info("기존 식단 {}건 삭제(회원:{}, 기간:{}~{})", ids.size(), memberId, start, end);
+        } else {
+            log.info("삭제할 기존 식단 없음(회원:{}, 날짜:{})", memberId, today);
+        }
     }
 
     private List<AiDietEntity> convertDtoToEntities(AiResponseDTO aiResponse, BigInteger memberId) {
