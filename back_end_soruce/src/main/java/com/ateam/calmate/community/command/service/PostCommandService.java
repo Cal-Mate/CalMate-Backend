@@ -30,12 +30,12 @@ public class PostCommandService {
     @Transactional
     public void createPost(PostCreateRequestDTO dto) {
 
-        // ✅ 첫 요청 방어: title/content/memberId가 null이면 무시
-        if (dto.getMemberId() == null || dto.getTitle() == null || dto.getContent() == null) {
-            System.out.println("⚠️ 비정상 요청 감지 (첫 요청 방어) → 포인트 반영 안 함");
-            return;
-        }
-
+//        // ✅ 첫 요청 방어: title/content/memberId가 null이면 무시
+//        if (dto.getMemberId() == null || dto.getTitle() == null || dto.getContent() == null) {
+//            System.out.println("⚠️ 비정상 요청 감지 (첫 요청 방어) → 포인트 반영 안 함");
+//            return;
+//        }
+        System.out.println("개시글 등록 service 시작");
         Post post = Post.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
@@ -56,7 +56,7 @@ public class PostCommandService {
                 .ifPresent(member -> {
                     int currentPoint = member.getPoint() == null ? 0 : member.getPoint();
                     member.setPoint(currentPoint + 10);
-                    communityPointRepository.save(member);  // ✅ 추가 (중복 flush 방지)
+//                    communityPointRepository.save(member);  // ✅ 추가 (중복 flush 방지)
                 });
 
         // 4️⃣ 포인트 로그 기록 (point 테이블)

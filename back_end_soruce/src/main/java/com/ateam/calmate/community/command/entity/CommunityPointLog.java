@@ -37,6 +37,7 @@ public class CommunityPointLog {
         if (historyTime == null) {
             historyTime = LocalDateTime.now();
         }
+        System.out.println("로컬데이터시간");
     }
 
     public enum Distinction {
