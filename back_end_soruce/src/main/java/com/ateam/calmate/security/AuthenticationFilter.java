@@ -1,7 +1,10 @@
 package com.ateam.calmate.security;
 
 import com.ateam.calmate.member.command.dto.RequestLoginDTO;
+import com.ateam.calmate.member.command.dto.ResoponseLoginDTO;
+import com.ateam.calmate.member.command.dto.TokenDTO;
 import com.ateam.calmate.member.command.dto.UserImpl;
+import com.ateam.calmate.member.command.service.RefreshTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -24,6 +27,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -35,19 +39,23 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final Environment env;
     private final JwtFactory  jwtFactory;
     private  final CookieUtil cookieUtil;
+    private final RefreshTokenService refreshTokenService;
 
-    @Value("${app.cookie.domain}") private String cookieDomain; // 쿠키 도메인 설정(example.com)
-    @Value("${token.refresh.expiration_time}")   private long refreshTtlMs;   // 리프레시 수명(ms)
+    private long refreshTtlMs;   // 리프레시 수명(ms)
 
 
     public AuthenticationFilter(AuthenticationManager authenticationManager,
                                 Environment env,  JwtFactory jwtFactory,
-                                CookieUtil cookieUtil) {
+                                CookieUtil cookieUtil
+    ,RefreshTokenService  refreshTokenService
+    ,long refreshTtlMs) {
         /* 설명. 새로 만든 프로바이더를 알고 있는 매니저를 인지시킴 */
         super(authenticationManager);
         this.env = env;
         this.jwtFactory = jwtFactory;
         this.cookieUtil = cookieUtil;
+        this.refreshTokenService = refreshTokenService;
+        this.refreshTtlMs = refreshTtlMs;
     }
 
     /* 필기. 인증 시작 */
@@ -82,6 +90,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         /* 설명. 프로바이더에서 반환한 내용 중 User의 내용은 principal로 저장되어 있음 */
         UserImpl user = (UserImpl) authResult.getPrincipal();
         String id = ((UserImpl) authResult.getPrincipal()).getUsername();
+        String device = request.getHeader("X-Device-Fp");
 
         // 권한정보 List<String>로 변환
         List<String> roles = authResult.getAuthorities().stream()
@@ -89,37 +98,29 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        /* 설명. 2. 재료를 활용한 JWT 토큰 제작(feat. build.gradle에 라이브러리 추가) */
-//        Claims claims = Jwts.claims().setSubject(id);
-//        claims.put("auth", roles);
-//        claims.put("username", user.getMemberName());
-//        claims.put("id", user.getId());
-//        claims.put("birth", user.getBirth());
-//        claims.put("memStsId", user.getMemStsId());
-//
-//        String token = Jwts.builder()
-//                .setClaims(claims)      // 등록된 클레임 + 비공개 클레임
-//                .setExpiration(new Date(System.currentTimeMillis()
-//                        + Long.parseLong(env.getProperty("token.access.expiration_time"))))
-//                .signWith(SignatureAlgorithm.HS512, env.getProperty("token.access.secret"))
-//                .compact();
-
-        // 2) 리프레시 jti 생성
+        // 리프레시 jti 생성
         String refreshJti = UUID.randomUUID().toString();
 
+        TokenDTO token = new TokenDTO(
+                roles, user.getMemberName(), user.getId(), user.getBirth(),
+                user.getMemStsId(), refreshJti
+        );
+
         //엑세스 토큰
-        String accessToken = jwtFactory.createAccessToken(roles, user, refreshJti);
+        String accessToken = jwtFactory.createAccessToken(token);
 
         //리프래시 토큰
-        String refreshToken = jwtFactory.createRefreshToken(roles, user, refreshJti);
+        String refreshToken = jwtFactory.createRefreshToken(token);
 
-
-
-        // 5) 쿠키로 리프레시 전달
-        ResponseCookie cookie = cookieUtil.createRefreshCookie(refreshToken, refreshTtlMs/1000, cookieDomain);
+        // 쿠키로 리프레시 전달
+        ResponseCookie cookie = cookieUtil.createRefreshCookie(refreshToken);
 
         response.addHeader("token", accessToken);
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        // DB 저장(회전 시작점)
+        LocalDateTime exp = LocalDateTime.now().plusSeconds(refreshTtlMs / 1000);
+        refreshTokenService.saveNew(token.getMemberId(), refreshToken, refreshJti, exp, device);            // 해시 저장
 
         // 정상 종료로  AuthenticationSuccessHandler 호출
         getSuccessHandler().onAuthenticationSuccess(request, response, authResult);

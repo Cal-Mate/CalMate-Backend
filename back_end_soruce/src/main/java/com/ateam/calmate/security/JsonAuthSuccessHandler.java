@@ -53,19 +53,19 @@ public class JsonAuthSuccessHandler implements AuthenticationSuccessHandler {
         Long id = user.getId();
         String userName = user.getMemberName();
         UploadFile profile = profileImageRepository.findByMemberId(id);
-        String profilePath = profile != null ? profile.getFilePath() +  profile.getOriginalFileName() : null;
+        String profilePath = profile != null ? profile.getFilePath() + profile.getReFileName() : null;
         List<String> authorities = toAuthorityList(authentication.getAuthorities());
 
-        if(profilePath != null){
-            String scheme = req.getScheme();         // http / https
-            String serverName = req.getServerName(); // localhost
-            int port = req.getServerPort();          // 8000
-
-            String requestPath = scheme + "://" + serverName +  ":" + port;
-
-            int index = profilePath.indexOf("/img");
-            profilePath =  requestPath + profilePath.substring(index,profilePath.length());
-        }
+//        if(profilePath != null){
+//            String scheme = req.getScheme();         // http / https
+//            String serverName = req.getServerName(); // localhost
+//            int port = req.getServerPort();          // 8000
+//
+//            String requestPath = scheme + "://" + serverName +  ":" + port;
+//
+//            int index = profilePath.indexOf("/img");
+//            profilePath =  requestPath + profilePath.substring(index,profilePath.length());
+//        }
 
         // 추가 필드 예시(원하면 req에 Attribute로 담아 오거나, DB 조회해서 채우기)
         Map<String, Object> extra = Map.of(
@@ -86,7 +86,7 @@ public class JsonAuthSuccessHandler implements AuthenticationSuccessHandler {
                 id, userName, user.getNickName(), user.getBodyMetric(),
                 user.getWeight(), user.getHeight(), user.getGender(),
                 user.getBirth(), userEmail, profilePath, user.getPhone(),
-                authorities
+                user.getMemStsId(), authorities
         );
         Map<String , Object> bodyPayload =  new HashMap<>();
         bodyPayload.put("user", resoponseLoginDTO);

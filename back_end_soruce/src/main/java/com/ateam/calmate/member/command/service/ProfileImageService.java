@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 public class ProfileImageService {
@@ -24,8 +25,8 @@ public class ProfileImageService {
     public ResponseProfileImageDTO updateProfileImage(MultipartFile singleFile, Long id, HttpServletRequest req) throws IOException {
         String originFileName = singleFile.getOriginalFilename();
         String ext = originFileName.substring(originFileName.lastIndexOf("."));
-        String saveName = id + ext;
-        String savePath = uploadDir + saveName;
+        String reName = UUID.randomUUID().toString() + ext;
+        String savePath = uploadDir + reName;
         // 폴더가 경로상에 없을 경우 생성
         File directory = new File(uploadDir);
         if (!directory.exists()) {
@@ -38,9 +39,12 @@ public class ProfileImageService {
         String serverName = req.getServerName(); // localhost
         int port = req.getServerPort();          // 8000
         String requestPath = scheme + "://" + serverName +  ":" + port;
-        String urlImagePath = requestPath + dirPath +  saveName;
+        String urlImagePath = requestPath + dirPath +  reName;
 
-        ResponseProfileImageDTO responseProfileImageDTO = new ResponseProfileImageDTO(id, uploadDir, savePath, urlImagePath, true,"");
+        String mimeType = singleFile.getContentType();
+        ResponseProfileImageDTO responseProfileImageDTO
+                = new ResponseProfileImageDTO(id ,mimeType, uploadDir,"ACTIVE", originFileName
+                ,reName,1L, urlImagePath, true,"");
 
         return responseProfileImageDTO;
     }

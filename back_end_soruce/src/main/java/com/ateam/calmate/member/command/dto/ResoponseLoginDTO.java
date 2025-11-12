@@ -21,5 +21,6 @@ public class ResoponseLoginDTO {
     private String userEmail;
     private String profilePath;
     private String phone;
+    private Long status;
     private List<String> authorities;
 }

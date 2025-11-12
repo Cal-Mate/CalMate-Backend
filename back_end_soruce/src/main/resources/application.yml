@@ -5,9 +5,9 @@ spring:
     name: member-client
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/project_4st
-    username: swcamp
-    password: swcamp
+    url: jdbc:mariadb://cal-mate.iptime.org:15161/cal_mate?&rewriteBatchedStatements=true
+    username: cal_mate
+    password: cal123123
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -47,7 +47,8 @@ logging:
 token:
   access:
     secret: v7o98gdK42iddFqTxH07Yjv18KbwIZWQZu7NRPeR9+ji9tOGDX2r8PO3mGptklEdEiIB0RMT066q3qb19YBfqQ==
-    expiration_time: 600000 # 10 분
+#    expiration_time: 600000 # 10 분
+    expiration_time: 6000 # 10 분
   refresh:
     secret: QUohbgcqwRhk+Xi7zbhgWrkGA0SFRI6OIjzjOsPMtXN5G6RtwBuX0UKENxM07M9WRQBnSuvmU3J4GEpPzqWj/w==
     expiration_time: 86400000 # 1 일 [ms] 단위
@@ -78,6 +79,9 @@ mybatis:
 # 프로필 이지미 관련 경로
 profile:
   dirPath: /img/profile/
+<<<<<<< HEAD
+=======
 
 #mybatis:
 #  mapper-locations: classpath*:com/ateam/calmate/**/mapper/*Mapper.xml
+>>>>>>> 2e52a5c283b05420d2c7cbb2f00e01d76ea3352d

@@ -3,18 +3,23 @@ package com.ateam.calmate.member.command.controller;
 import com.ateam.calmate.common.ResponseMessage;
 import com.ateam.calmate.member.command.dto.*;
 import com.ateam.calmate.member.command.service.MemberService;
+import com.ateam.calmate.member.command.service.RefreshTokenService;
+import com.ateam.calmate.security.CookieUtil;
+import com.ateam.calmate.security.JwtFactory;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/member")
@@ -23,12 +28,23 @@ public class MemberController {
 
     private final MemberService memberService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtFactory  jwt;
+    private final CookieUtil cookieUtil;
+    private final RefreshTokenService refreshTokenService;
+
 
     public MemberController(MemberService memberService
-    , BCryptPasswordEncoder bCryptPasswordEncoder) {
+    , BCryptPasswordEncoder bCryptPasswordEncoder
+    , JwtFactory  jwt
+    , CookieUtil cookieUtil
+    , RefreshTokenService refreshTokenService) {
         this.memberService = memberService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwt = jwt;
+        this.cookieUtil = cookieUtil;
+        this.refreshTokenService = refreshTokenService;
     }
+
 
 
     @GetMapping("/member-info/{id}")
@@ -177,6 +193,42 @@ public class MemberController {
                 .body(responseMessage);
     }
 
+    // 리프레시: 회전 + 재사용감지
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(
+            @CookieValue(name = CookieUtil.REFRESH_COOKIE, required = false) String refreshCookie,
+            @RequestHeader(value = "X-Device-Fp", required = false) String deviceFp) {
+        try {
+            if (refreshCookie == null) return ResponseEntity.status(401).build();    // 쿠키 없음
+
+            ResponseTokenDTO responseTokenDTO = refreshTokenService.refreshToken(refreshCookie, deviceFp);
+
+
+            //새 리프레시 쿠키로 교체
+            ResponseCookie cookie = cookieUtil.createRefreshCookie(responseTokenDTO.getRefreshToken());
+
+            System.out.println(responseTokenDTO);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(Map.of("accessToken", responseTokenDTO.getAccessToken()));
+
+        } catch (RuntimeException ex) {
+            // 재사용 감지/오류 → 전체 세션 강제폐기 + 쿠키 삭제 권장
+            // rts.revokeAllForUser(userId) // userId 파악 가능할 때
+            ResponseCookie del = cookieUtil.deleteRefreshCookie();
+            return ResponseEntity.status(401)
+                    .header(HttpHeaders.SET_COOKIE, del.toString())
+                    .build();
+        }
+    }
+
+    // 로그아웃: 현재 사용자 모든 리프레시 폐기 + 쿠키 삭제
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestParam Long memberId) {
+        refreshTokenService.revokeAllForUser(memberId);                                    // 전체 폐기
+        ResponseCookie del = cookieUtil.deleteRefreshCookie();// 쿠키 삭제
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, del.toString()).build();
+    }
 
 
 

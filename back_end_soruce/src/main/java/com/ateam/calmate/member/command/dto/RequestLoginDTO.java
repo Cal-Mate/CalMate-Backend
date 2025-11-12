@@ -11,4 +11,5 @@ import lombok.*;
 public class RequestLoginDTO {
     private String email;
     private String pwd;
+//    private String deviceFp;
 }
