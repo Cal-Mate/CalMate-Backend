@@ -14,7 +14,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -28,17 +31,23 @@ public class ExerciseCommandServiceImpl implements ExerciseCommandService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseFileUploadRepository fileRepository;
     private final ExerciseExtendFilePathRepository extendPathRepository;
+    private final ExercisePointService exercisePointService;   // ✅ 포인트 서비스 주입
 
     private final Path exerciseRootDir =
             Paths.get(System.getProperty("user.dir"), "img", "exercise");
 
     @Override
     public Long createExercise(ExerciseRequest request, List<MultipartFile> files) throws IOException {
+
+        // ✅ 운동 엔티티 저장
         Exercise exercise = exerciseRepository.save(request.toEntity());
 
         if (files != null && !files.isEmpty()) {
             saveFiles(files, exercise);
         }
+
+        // ✅ 작성할 때마다 5포인트 지급
+        exercisePointService.earnExercisePoint(request.getMemberId());
 
         return exercise.getId();
     }
