@@ -3,10 +3,10 @@ package com.ateam.calmate.calendar.command.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "calender") // 실제 테이블명에 맞게 (calendar면 변경)
+@Table(name = "calendar")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,19 +19,19 @@ public class CalendarEntity {
     private Long id;
 
     @Column(name = "cal_day", nullable = false)
-    private LocalDateTime calDay;
+    private LocalDate calDay;
 
-    @Column(name = "badge_count")
-    private Integer badgeCount;
-
-    @Column(name = "exercise_status")
+    @Column(name = "exercise_status", nullable = false)
     private Integer exerciseStatus;
 
-    @Column(name = "meal_status")
+    @Column(name = "meal_status", nullable = false)
     private Integer mealStatus;
 
-    @Column(name = "diary_status")
+    @Column(name = "diary_status", nullable = false)
     private Integer diaryStatus;
+
+    @Column(name = "badge_yn", nullable = false)
+    private Integer badgeYn;   // 0 or 1
 
     @Column(name = "member_id", nullable = false)
     private Long memberId;

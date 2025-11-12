@@ -18,7 +18,7 @@ public class DiaryController {
 
     private final DiaryMapper diaryMapper;
 
-    // 📘 목록 조회 (memberId 없으면 전체)
+    // 목록 조회 (memberId 없으면 전체)
     @GetMapping
     public List<DiaryResponse> getDiaries(
             @RequestParam(required = false) Long memberId,
@@ -30,7 +30,7 @@ public class DiaryController {
         return diaryMapper.selectDiaryList(memberId, resolvedLimit, resolvedOffset);
     }
 
-    // 📘 날짜별 조회 (memberId 있으면 회원 필터, 없으면 전체 해당 날짜)
+    // 날짜별 조회 (memberId 유무에 따라 필터)
     @GetMapping("/day")
     public List<DiaryResponse> getDiaryByDay(
             @RequestParam(required = false) Long memberId,
@@ -40,7 +40,7 @@ public class DiaryController {
         return diaryMapper.selectDiaryListByMemberAndDay(memberId, parsedDay.toString());
     }
 
-    // 📘 상세 조회 (memberId 없으면 소유자 제한 없이 조회)
+    // 상세 조회
     @GetMapping("/{diaryId}")
     public ResponseEntity<?> getDiaryDetail(
             @PathVariable Integer diaryId,

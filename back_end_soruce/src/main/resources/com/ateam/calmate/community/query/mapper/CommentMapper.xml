@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.community.query.mapper.CommentMapper">
+
+    <!-- 댓글 + 대댓글 전부 평면으로 조회 후 서비스에서 트리화 -->
+    <select id="findByPostIdWithLike" resultType="com.ateam.calmate.community.query.dto.CommentResponseDTO">
+        SELECT
+            pc.id,
+            pc.post_id AS postId,
+            m.nickname AS authorName,
+            pc.content,
+            DATE_FORMAT(pc.create_at, '%Y-%m-%d %H:%i') AS createdAt,
+            pc.member_parent_comment_id AS parentId,
+
+            -- ✅ 댓글 좋아요 개수
+            (SELECT COUNT(*) FROM comment_like cl WHERE cl.post_comment_id = pc.id) AS likeCount,
+
+            -- ✅ 현재 로그인 유저가 좋아요 눌렀는지 여부
+            EXISTS(
+                SELECT 1 FROM comment_like cl2
+                WHERE cl2.post_comment_id = pc.id AND cl2.member_id = #{memberId}
+            ) AS liked
+
+        FROM post_comment pc
+                 JOIN member m ON pc.member_id = m.id
+        WHERE pc.post_id = #{postId}
+        ORDER BY pc.create_at ASC, pc.id ASC
+    </select>
+
+    <insert id="insertComment">
+        INSERT INTO post_comment (post_id, member_id, content, member_parent_comment_id, create_at)
+        VALUES (#{postId}, #{memberId}, #{content}, #{parentId}, NOW())
+    </insert>
+
+    <!-- ✅ 댓글 수정 -->
+    <update id="updateComment">
+        UPDATE post_comment
+        SET content = #{content}
+        WHERE id = #{commentId}
+    </update>
+
+    <!-- ✅ 댓글 삭제 -->
+<!--    <delete id="deleteComment">-->      <!--해당 쿼리 사용하면 자식댓글이 있으면 삭제불가 -->
+<!--        DELETE FROM post_comment-->
+<!--        WHERE id = #{commentId}-->
+<!--    </delete>-->
+    <delete id="deleteComment">
+        UPDATE post_comment
+        SET content = '삭제된 댓글입니다.'
+        WHERE id = #{commentId}
+    </delete>
+
+</mapper>

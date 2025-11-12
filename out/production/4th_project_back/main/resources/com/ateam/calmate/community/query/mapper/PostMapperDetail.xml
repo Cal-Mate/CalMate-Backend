@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.community.query.mapper.PostMapperDetail">
+
+    <select id="findPostDetail" resultType="com.ateam.calmate.community.query.dto.PostDetailDTO">
+        SELECT
+            p.id AS id,
+            p.title AS title,
+            p.content AS content,
+--             p.created_at AS createdAt,
+            DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') AS createdAt,
+            m.nickname AS authorName,
+            t.name AS tagName,
+            (SELECT COUNT(*) FROM post_like pl WHERE pl.post_id = p.id) AS likes,
+            (SELECT COUNT(*) FROM post_comment pc WHERE pc.post_id = p.id) AS comments,
+            pf.url AS imageUrl
+        FROM post p
+                 JOIN member m ON p.member_id = m.id
+                 LEFT JOIN tag t ON p.tag_id = t.id
+                 LEFT JOIN post_file pf ON p.id = pf.post_id
+        WHERE p.id = #{postId}
+    </select>
+
+</mapper>
