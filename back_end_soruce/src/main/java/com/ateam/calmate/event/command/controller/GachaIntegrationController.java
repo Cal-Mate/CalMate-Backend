@@ -23,6 +23,7 @@ public class GachaIntegrationController {
 
     private final GachaEventQueryService eventQueryService;
     private final GachaBoardCommandService boardCommandService;
+    private final com.ateam.calmate.event.command.service.gacha.GachaCommandService gachaCommandService;
 
     @GetMapping("/event/active")
     public ResponseEntity<GachaEventDTO> getActiveEvent() {
@@ -44,8 +45,12 @@ public class GachaIntegrationController {
     }
 
     @GetMapping("/member/{memberId}/event/{eventId}/board")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<GachaBoardResponse> getBoardSnapshot(@PathVariable Long memberId,
                                                               @PathVariable Long eventId) {
+        // 초기 보드가 없으면 자동 생성
+        boardCommandService.ensureInitialBoardExists(eventId);
+
         return eventQueryService.getBoardSnapshot(eventId)
                 .map(snapshot -> ResponseEntity.ok(
                         new GachaBoardResponse(
@@ -91,6 +96,20 @@ public class GachaIntegrationController {
                 history.getTotalPages(),
                 history.isLast()
         );
+    }
+
+    /**
+     * 가챠 뽑기 (포인트 차감 포함)
+     * POST /api/gacha/event/{eventId}/draw
+     */
+    @PostMapping("/event/{eventId}/draw")
+    public ResponseEntity<com.ateam.calmate.event.command.dto.gacha.GachaDrawResult> drawGacha(
+            @PathVariable Long eventId,
+            @RequestParam Long memberId,
+            @RequestParam Long cellId) {
+        com.ateam.calmate.event.command.dto.gacha.GachaDrawResult result =
+                gachaCommandService.draw(eventId, memberId, cellId);
+        return ResponseEntity.ok(result);
     }
 
     public record GachaBoardResponse(

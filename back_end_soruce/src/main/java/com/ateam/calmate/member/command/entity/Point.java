@@ -39,6 +39,7 @@ public class Point {
     private Integer bingoBoardId;
 
     @Column(name = "histoy_time", nullable = false, insertable = false )
+    @Transient
     private Integer histoyTime;
 
     // ✅ enum 타입 정의 (DB의 ENUM('EARN','USE') 매핑)

@@ -11,6 +11,8 @@ import com.ateam.calmate.event.command.repository.bingo.BingoBoardCommandReposit
 import com.ateam.calmate.event.command.repository.bingo.BingoCellCommandRepository;
 import com.ateam.calmate.event.command.repository.bingo.BingoFileUploadCommandRepository;
 import com.ateam.calmate.event.query.dto.bingo.BingoLineJudge;
+import com.ateam.calmate.member.command.entity.Point;
+import com.ateam.calmate.member.command.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,11 +32,12 @@ public class BingoCommandServiceImpl implements BingoCommandService {
     private final BingoFileUploadCommandRepository uploadRepo;
     private final FileStoragePort fileStorage;
     private final PointsPort pointsPort;
+    private final PointRepository pointRepository;
 
     @Value("${bingo.points.perLine:50}")
     private int perLinePoint;
 
-    @Value("${bingo.points.boardBonus:200}")
+    @Value("${bingo.points.boardBonus:500}")
     private int boardBonusPoint;
 
     @Value("${bingo.default-extend-file-path-id:1}")
@@ -78,9 +81,15 @@ public class BingoCommandServiceImpl implements BingoCommandService {
         List<BingoLineJudge.Pos> checked = new ArrayList<>();
         var allCells = cellRepo.findAllByBoardId(board.getId());
         for (BingoCellEntity c : allCells) {
-            if (Boolean.TRUE.equals(c.getChecked())) {
-                checked.add(new BingoLineJudge.Pos(c.getRow(), c.getCol()));
+            if (!Boolean.TRUE.equals(c.getChecked())) {
+                continue;
             }
+            Integer rowIdx = toZeroBased(c.getRow());
+            Integer colIdx = toZeroBased(c.getCol());
+            if (rowIdx == null || colIdx == null) {
+                continue;
+            }
+            checked.add(new BingoLineJudge.Pos(rowIdx, colIdx));
         }
 
         var progress = BingoLineJudge.judge(board.getSize(), checked, BingoLineJudge.CompletionPolicy.oneLine());
@@ -89,10 +98,12 @@ public class BingoCommandServiceImpl implements BingoCommandService {
         int points = 0;
         if (progress.getCompletedLineCount() > 0) {
             pointsPort.addPoints(board.getMemberId(), perLinePoint, "BINGO_LINE");
+            recordPointHistory(board, perLinePoint, Point.Distinction.EARN);
             points += perLinePoint;
         }
         if (progress.isCompleted()) {
             pointsPort.addPoints(board.getMemberId(), boardBonusPoint, "BINGO_COMPLETE");
+            recordPointHistory(board, boardBonusPoint, Point.Distinction.EARN);
             points += boardBonusPoint;
         }
 
@@ -113,5 +124,24 @@ public class BingoCommandServiceImpl implements BingoCommandService {
             return requested;
         }
         return defaultExtendFilePathId;
+    }
+
+    private void recordPointHistory(BingoBoardEntity board, int amount, Point.Distinction distinction) {
+        Point history = new Point();
+        history.setMemberId(board.getMemberId());
+        history.setPoint(amount);
+        history.setDistinction(distinction);
+        history.setBingoBoardId(board.getId());
+        pointRepository.save(history);
+    }
+
+    private Integer toZeroBased(Integer value) {
+        if (value == null) {
+            return null;
+        }
+        if (value <= 0) {
+            return value;
+        }
+        return value - 1;
     }
 }

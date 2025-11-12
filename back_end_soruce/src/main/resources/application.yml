@@ -5,9 +5,9 @@ spring:
     name: member-client
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/calmate?&rewriteBatchedStatements=true
-    username: root
-    password: mariadb
+    url: jdbc:mariadb://localhost:3306/calmate
+    username: swcamp
+    password: swcamp
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -71,13 +71,11 @@ app:
   cookie:
     domain: calMate.com
 mybatis:
-  mapper-locations: classpath*:mapper/**/*.xml
+#  mapper-locations: classpath*:mapper/**/*.xml
+  mapper-locations: classpath*:com/ateam/calmate/**/mapper/*Mapper.xml
   configuration:
     map-underscore-to-camel-case: true
 
 # 프로필 이지미 관련 경로
 profile:
   dirPath: /img/profile/
-
-mybatis:
-  mapper-locations: classpath*:com/ateam/calmate/**/mapper/*Mapper.xml
