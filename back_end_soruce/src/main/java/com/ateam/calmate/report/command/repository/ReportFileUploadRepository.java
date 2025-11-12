@@ -5,3 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReportFileUploadRepository extends JpaRepository<ReportFileUpload, Integer> {
 }
+

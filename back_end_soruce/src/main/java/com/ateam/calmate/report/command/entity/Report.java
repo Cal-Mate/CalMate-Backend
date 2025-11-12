@@ -7,54 +7,65 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "report")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "report")
 public class Report {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;                        // 신고번호
+    private Long id;
 
-    private String title;                   // 신고 제목
+    private String title;
 
-    private String contents;                // 신고 내용
+    private String contents;
 
-    private Boolean yn;                     // 신고 여부(처리 여부)
+    // tinyint(1) → boolean 매핑
+    private Boolean yn;
 
-    private LocalDateTime date;             // 신고일자
+    // 컬럼명이 date
+    @Column(name = "date")
+    private LocalDateTime date;
 
-    @Column(name = "report_image_url")
-    private String reportImageUrl;          // 대표 이미지 URL (선택)
+    @Column(name = "report_image_url", length = 500)
+    private String reportImageUrl;
 
+    // 피신고자
     @Column(name = "member_id2")
-    private Long memberId2;                 // 신고 당한 회원 번호
+    private Long memberId2;
 
     @Column(name = "post_id")
-    private Integer postId;                 // 신고 대상 게시글 번호 (nullable)
+    private Long postId;
 
     @Column(name = "comment_id")
-    private Integer commentId;              // 신고 대상 댓글 번호 (nullable)
+    private Long commentId;
 
     @Column(name = "admin_id")
-    private Long adminId;                   // 처리한 관리자 ID (nullable)
+    private Long adminId;
 
+    // FK: report_base.id
     @Column(name = "report_id")
-    private Integer reportBaseId;           // 신고 사유 코드 (report_base.id)
+    private Integer reportId;
 
+    // 신고자
     @Column(name = "member_id")
-    private Long memberId;                  // 신고한 회원 번호
+    private Long memberId;
 
+    // 파일 업로드 연관
     @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ReportFileUpload> fileUploads = new ArrayList<>();
 
     public void addFile(ReportFileUpload upload) {
+        if (upload == null) return;
         fileUploads.add(upload);
         upload.setReport(this);
     }
+
+    public void setYn(Boolean yn) { this.yn = yn; }
+    public void setAdminId(Long adminId) { this.adminId = adminId; }
+    public void setReportImageUrl(String reportImageUrl) { this.reportImageUrl = reportImageUrl; }
 }
