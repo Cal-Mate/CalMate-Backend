@@ -49,7 +49,6 @@ public class AiDietCommandService {
                 sendRequest,    // 보낼 객체 (자동으로 JSON이 됩니다)
                 AiResponseDTO.class // 응답받을 객체 타입
         );
-        log.info("aiResponse={}", aiResponse.toString());
 
         // ai_diet 테이블에 응답을 저장
         List<AiDietEntity> entitiesToSave = convertDtoToEntities(aiResponse, memberId);
@@ -132,4 +131,38 @@ public class AiDietCommandService {
     }
 
 
+    public AiExerciseResponseDTO getExercise(RequestExerciseDTO request) {
+        BigInteger memberId = request.getMemberId();
+        // AI 전해줄 DTO 만드는 과정 = 목표, 목표 몸무게, 알레르기 불러오기
+        AiExerciseRequestDTO exerciseRequest = makeAiExerciseRequest(request);
+        log.info("sendExerciseRequest={}", exerciseRequest);
+
+        // Fast API로 통신
+        String fastApiUrl = "http://localhost:8000/api/v1/exercise/recommend";
+        log.info("AI 서버({})에 운동 추천을 요청합니다...", fastApiUrl);
+
+        // AI 응답으로 온 Json을 편집
+        AiExerciseResponseDTO exerciseResponse = restTemplate.postForObject(
+                fastApiUrl,     // 요청 URL
+                exerciseRequest,    // 보낼 객체 (자동으로 JSON이 됩니다)
+                AiExerciseResponseDTO.class // 응답받을 객체 타입
+        );
+        // AiResponse 반환하기
+        return exerciseResponse;
+    }
+
+    private AiExerciseRequestDTO makeAiExerciseRequest(RequestExerciseDTO request) {
+        AiExerciseRequestDTO exerciseRequest = new AiExerciseRequestDTO();
+        exerciseRequest.setGender(request.getGender());
+        exerciseRequest.setHeight(request.getHeight());
+        exerciseRequest.setWeight(request.getWeight());
+        GoalQueryDTO result = aiDietQueryService.getMemberGoalInfo(request.getMemberId());
+        exerciseRequest.setGoalType(result.getGoalType());
+        exerciseRequest.setTargetValue(result.getTargetValue());
+        exerciseRequest.setStartDate(result.getStartDate());
+        exerciseRequest.setEndDate(result.getEndDate());
+        exerciseRequest.setBodyMetric(request.getBodyMetric());
+
+        return exerciseRequest;
+    }
 }

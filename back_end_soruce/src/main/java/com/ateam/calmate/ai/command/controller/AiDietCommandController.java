@@ -1,8 +1,6 @@
 package com.ateam.calmate.ai.command.controller;
 
-import com.ateam.calmate.ai.command.dto.AiResponseDTO;
-import com.ateam.calmate.ai.command.dto.RequestDietDTO;
-import com.ateam.calmate.ai.command.dto.ResponseDietDTO;
+import com.ateam.calmate.ai.command.dto.*;
 import com.ateam.calmate.ai.command.service.AiDietCommandService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +26,12 @@ public class AiDietCommandController {
         AiResponseDTO response = aiDietCommandService.getDietAndSave(request);
         log.info(response.toString());
         return ResponseEntity.ok(response); // 오류나면 어떤 Response인지 알 수 있도록 수정해야함
+    }
+
+    @PostMapping("/exercise")
+    public ResponseEntity<AiExerciseResponseDTO> requestExercise(@RequestBody RequestExerciseDTO request) {
+        log.info(request.toString());
+        AiExerciseResponseDTO response = aiDietCommandService.getExercise(request);
+        return ResponseEntity.ok(response);
     }
 }
