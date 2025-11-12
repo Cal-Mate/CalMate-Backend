@@ -59,8 +59,37 @@ public class WebSecurity {
         http.authorizeHttpRequests(authz ->
                                 authz
                                         .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()     // 테스트를 위해 모든 권한 오픈
-                                        .requestMatchers("/**").permitAll()
-//                                        .requestMatchers(HttpMethod.GET, "/img/**").permitAll()     // 이미지 경로는 누구나 접근 허용
+//                                        .requestMatchers("/**").permitAll()
+
+                                        // 로그인, 회원가입 허용
+                                        .requestMatchers(
+//                                                "/member/login",
+                                                "/member/member"
+                                        ).permitAll()
+
+                                        // 커뮤니티 조회는 모두 허용
+                                        .requestMatchers(HttpMethod.GET, "/community/posts").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/community/post/*").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/community/post/*/comments").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/community/ranking").permitAll()
+
+                                        // 커뮤니티 댓글 (작성/수정/삭제)
+                                        .requestMatchers(HttpMethod.POST, "/community/post/*/comments").authenticated()
+                                        .requestMatchers(HttpMethod.PATCH, "/community/post/*/comments/*").authenticated()
+                                        .requestMatchers(HttpMethod.DELETE, "/community/post/*/comments/*").authenticated()
+
+                                        // 게시글 (작성/수정/삭제)
+                                        .requestMatchers(HttpMethod.POST, "/community/post").authenticated()     // 토큰때문에 안되면 permitAll()로 수정
+                                        .requestMatchers(HttpMethod.PATCH, "/community/post/*").authenticated()  // 토큰때문에 안되면 permitAll()로 수정
+                                        .requestMatchers(HttpMethod.DELETE, "/community/post/*").authenticated() // 토큰때문에 안되면 permitAll()로 수정
+
+                                        // 게시글 및 댓글 좋아요
+                                        .requestMatchers(HttpMethod.POST, "/community/post/*/like").authenticated()
+                                        .requestMatchers(HttpMethod.POST, "/community/comment/*/like").authenticated()
+
+                                        // 이미지 경로는 누구나 접근 허용
+                                        .requestMatchers(HttpMethod.GET, "/img/**").permitAll()
+
 //                                        .requestMatchers(HttpMethod.POST,"/member/member").permitAll()
 //                                        .requestMatchers(
 //                                                "/v3/api-docs/**",

@@ -2,13 +2,11 @@ package com.ateam.calmate.community.command.service;
 
 import com.ateam.calmate.community.command.dto.PostCreateRequestDTO;
 import com.ateam.calmate.community.command.dto.PostUpdateRequestDTO;
+import com.ateam.calmate.community.command.entity.CommunityPointLog;
 import com.ateam.calmate.community.command.entity.PostExtendFilePath;
 import com.ateam.calmate.community.command.entity.Post;
 import com.ateam.calmate.community.command.entity.PostFile;
-import com.ateam.calmate.community.command.repository.CommunityPointRepository;
-import com.ateam.calmate.community.command.repository.PostExtendFilePathRepository;
-import com.ateam.calmate.community.command.repository.PostFileRepository;
-import com.ateam.calmate.community.command.repository.PostRepository;
+import com.ateam.calmate.community.command.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +25,16 @@ public class PostCommandService {
     private final PostFileRepository postFileRepository;
     private final CommunityPointRepository communityPointRepository;
     private final PostExtendFilePathRepository postextendFilePathRepository;
+    private final CommunityPointLogRepository communityPointLogRepository;
 
     @Transactional
     public void createPost(PostCreateRequestDTO dto) {
+
+        // ✅ 첫 요청 방어: title/content/memberId가 null이면 무시
+        if (dto.getMemberId() == null || dto.getTitle() == null || dto.getContent() == null) {
+            System.out.println("⚠️ 비정상 요청 감지 (첫 요청 방어) → 포인트 반영 안 함");
+            return;
+        }
 
         Post post = Post.builder()
                 .title(dto.getTitle())
@@ -46,12 +51,23 @@ public class PostCommandService {
             dto.getImages().forEach(img -> saveImage(img, savedPost.getId()));
         }
 
-        // 포인트 +10 적립
+        // 포인트 +10 적립(member 테이블에 +10 추가)
         communityPointRepository.findById(dto.getMemberId())
                 .ifPresent(member -> {
                     int currentPoint = member.getPoint() == null ? 0 : member.getPoint();
                     member.setPoint(currentPoint + 10);
+                    communityPointRepository.save(member);  // ✅ 추가 (중복 flush 방지)
                 });
+
+        // 4️⃣ 포인트 로그 기록 (point 테이블)
+        CommunityPointLog pointLog = CommunityPointLog.builder()
+                .point(10)
+                .distinction(CommunityPointLog.Distinction.EARN)
+                .reason("Community")
+                .memberId(dto.getMemberId().longValue())
+                .build();
+        communityPointLogRepository.save(pointLog);
+
     }
 
     @Transactional
