@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "AuthorityList")
+@Table(name = "authorites")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,9 +17,9 @@ public class AuthorityList {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "authName", nullable = false)
-    private String authName;
+    @Column(name = "authurity", nullable = false)
+    private String authurity;
 
-    @Column(name = "authDescribe")
-    private String authDescribe;
+    @Column(name = "description")
+    private String description;
 }

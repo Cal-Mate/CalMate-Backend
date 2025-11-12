@@ -1,12 +1,10 @@
 package com.ateam.calmate.exerciseRecords.command.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.ateam.calmate.exerciseRecords.command.entity.Exercise;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,11 +13,23 @@ import java.time.LocalDate;
 @Builder
 public class ExerciseRequest {
 
+    private Long memberId;
     private LocalDate date;
     private String type;
     private String category;
     private Integer min;
     private Integer burnedKcal;
-    private Long memberId;
-}
 
+    private List<Long> keepFileIds;
+
+    public Exercise toEntity() {
+        return Exercise.builder()
+                .memberId(memberId)
+                .date(date)
+                .type(type)
+                .category(category)
+                .min(min)
+                .burnedKcal(burnedKcal)
+                .build();
+    }
+}

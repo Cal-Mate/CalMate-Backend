@@ -8,10 +8,14 @@ import lombok.*;
 @Setter
 @ToString
 public class ResponseProfileImageDTO {
-    Long cumId;
-    String dirPath;
-    String filePath;
-    String urlPath;
-    boolean successUpload;
-    String exceptionMessage;
+    private Long memberId;
+    private String mimeType;
+    private String filePath;
+    private String state;
+    private String originalFileName;
+    private String reFileName;
+    private Long extendFilePathId;
+    private String urlPath;
+    private boolean successUpload;
+    private String exceptionMessage;
 }

@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ReportMemberDTO {
     private Long id;
-    private String memName;
+    private String name;
     private String email;
     private Long memStsId;
     private int banCnt;

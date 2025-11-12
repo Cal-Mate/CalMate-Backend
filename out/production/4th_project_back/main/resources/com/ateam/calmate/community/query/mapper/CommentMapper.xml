@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.community.query.mapper.CommentMapper">
+
+    <!-- 댓글 + 대댓글 전부 평면으로 조회 후 서비스에서 트리화 -->
+    <select id="findByPostId" resultType="com.ateam.calmate.community.query.dto.CommentResponseDTO">
+        SELECT
+            pc.id,
+            pc.post_id          AS postId,
+            m.nickname          AS authorName,
+            pc.content,
+            DATE_FORMAT(pc.create_at, '%Y-%m-%d %H:%i') AS createdAt,
+            pc.member_parent_comment_id AS parentId
+        FROM post_comment pc
+                 JOIN member m ON pc.member_id = m.id
+        WHERE pc.post_id = #{postId}
+        ORDER BY pc.create_at ASC, pc.id ASC
+    </select>
+
+    <insert id="insertComment">
+        INSERT INTO post_comment (post_id, member_id, content, member_parent_comment_id, create_at)
+        VALUES (#{postId}, #{memberId}, #{content}, #{parentId}, NOW())
+    </insert>
+
+</mapper>

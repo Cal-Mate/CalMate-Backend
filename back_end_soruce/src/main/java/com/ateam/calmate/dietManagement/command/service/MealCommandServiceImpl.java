@@ -2,14 +2,8 @@ package com.ateam.calmate.dietManagement.command.service;
 
 import com.ateam.calmate.dietManagement.command.dto.FoodRequest;
 import com.ateam.calmate.dietManagement.command.dto.MealRequest;
-import com.ateam.calmate.dietManagement.command.entity.ExtendFilePath;
-import com.ateam.calmate.dietManagement.command.entity.Food;
-import com.ateam.calmate.dietManagement.command.entity.FoodFileUpload;
-import com.ateam.calmate.dietManagement.command.entity.Meal;
-import com.ateam.calmate.dietManagement.command.repository.ExtendFilePathRepository;
-import com.ateam.calmate.dietManagement.command.repository.FoodFileUploadRepository;
-import com.ateam.calmate.dietManagement.command.repository.FoodRepository;
-import com.ateam.calmate.dietManagement.command.repository.MealRepository;
+import com.ateam.calmate.dietManagement.command.entity.*;
+import com.ateam.calmate.dietManagement.command.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,18 +26,21 @@ public class MealCommandServiceImpl implements MealCommandService {
     private final MealRepository mealRepository;
     private final FoodRepository foodRepository;
     private final FoodFileUploadRepository fileUploadRepository;
-    private final ExtendFilePathRepository extendFilePathRepository;
+    private final FoodExtendFilePathRepository extendFilePathRepository;
+    private final MealPointService mealPointService; // ✅ 포인트 서비스
 
-    private final String uploadRootDir = "uploads/meal";
+    private final String uploadRootDir = "img/meal";
 
     @Override
     public Long createMeal(MealRequest request, List<MultipartFile> files) {
+        // ✅ 식사 엔티티 생성
         Meal meal = Meal.builder()
                 .date(request.getDate())
                 .type(request.getType())
                 .memberId(request.getMemberId())
                 .build();
 
+        // ✅ 음식 엔티티 생성 및 저장
         Food food = buildFoodFromRequest(request.getFood());
         foodRepository.save(food);
 
@@ -53,15 +50,17 @@ public class MealCommandServiceImpl implements MealCommandService {
 
         mealRepository.save(meal);
 
+        // ✅ 파일 저장
         if (files != null && !files.isEmpty()) {
             int order = 1;
             for (MultipartFile file : files) {
-                if (file.isEmpty()) {
-                    continue;
-                }
+                if (file.isEmpty()) continue;
                 saveFile(meal, file, order++);
             }
         }
+
+        // ✅ 작성할 때마다 5포인트 지급
+        mealPointService.earnMealPoint(request.getMemberId());
 
         return meal.getId();
     }
@@ -75,24 +74,34 @@ public class MealCommandServiceImpl implements MealCommandService {
         meal.setType(request.getType());
         meal.setMemberId(request.getMemberId());
 
+        // ✅ 음식 업데이트
         meal.getFoods().clear();
         Food food = buildFoodFromRequest(request.getFood());
         foodRepository.save(food);
         meal.getFoods().add(food);
 
-        if (files != null && !files.isEmpty()) {
-            deletePhysicalFiles(meal);
+        List<Long> keepFileIds = request.getKeepFileIds();
+        boolean hasNewFiles = (files != null && !files.isEmpty());
+        boolean touchImages = (keepFileIds != null) || hasNewFiles;
 
-            List<FoodFileUpload> oldFiles = new ArrayList<>(meal.getFiles());
-            for (FoodFileUpload f : oldFiles) {
+        if (!touchImages) return;
+
+        // ✅ 기존 파일 중에서 유지 안 하는 것 삭제
+        List<FoodFileUpload> currentFiles = new ArrayList<>(meal.getFiles());
+        for (FoodFileUpload f : currentFiles) {
+            boolean keep = (keepFileIds != null && keepFileIds.contains(f.getId()));
+            if (!keep) {
+                deletePhysicalFile(f);
                 meal.getFiles().remove(f);
+                fileUploadRepository.delete(f);
             }
+        }
 
-            int order = 1;
+        // ✅ 새 파일 저장
+        if (hasNewFiles) {
+            int order = meal.getFiles().size() + 1;
             for (MultipartFile file : files) {
-                if (file.isEmpty()) {
-                    continue;
-                }
+                if (file.isEmpty()) continue;
                 saveFile(meal, file, order++);
             }
         }
@@ -103,7 +112,13 @@ public class MealCommandServiceImpl implements MealCommandService {
         Meal meal = mealRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("meal not found"));
 
-        deletePhysicalFiles(meal);
+        List<FoodFileUpload> oldFiles = new ArrayList<>(meal.getFiles());
+        for (FoodFileUpload f : oldFiles) {
+            deletePhysicalFile(f);
+            meal.getFiles().remove(f);
+            fileUploadRepository.delete(f);
+        }
+
         mealRepository.delete(meal);
     }
 
@@ -137,14 +152,13 @@ public class MealCommandServiceImpl implements MealCommandService {
             String storeName = UUID.randomUUID() + (ext != null ? "." + ext : "");
 
             Path root = Paths.get(uploadRootDir).toAbsolutePath().normalize();
-            Path dir = root.resolve(String.valueOf(meal.getId()));
-            Files.createDirectories(dir);
+            Files.createDirectories(root);
 
-            Path filePath = dir.resolve(storeName);
+            Path filePath = root.resolve(storeName);
             file.transferTo(filePath.toFile());
 
-            ExtendFilePath extendFilePath = ExtendFilePath.builder()
-                    .urlPath("")
+            FoodExtendFilePath extendFilePath = FoodExtendFilePath.builder()
+                    .urlPath("/img/meal/")
                     .build();
             extendFilePathRepository.save(extendFilePath);
 
@@ -153,7 +167,7 @@ public class MealCommandServiceImpl implements MealCommandService {
                     .name(originalName)
                     .type(file.getContentType())
                     .reName(storeName)
-                    .path(dir.toString())
+                    .path("")
                     .thumbPath("")
                     .uploadOrder(order)
                     .extendFilePath(extendFilePath)
@@ -162,26 +176,18 @@ public class MealCommandServiceImpl implements MealCommandService {
             meal.addFile(upload);
             fileUploadRepository.save(upload);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("file save error: " + e.getMessage(), e);
         }
     }
 
-    private void deletePhysicalFiles(Meal meal) {
-        if (meal.getFiles() == null || meal.getFiles().isEmpty()) {
-            return;
-        }
-
-        for (FoodFileUpload f : meal.getFiles()) {
-            try {
-                if (f.getPath() == null || f.getReName() == null) {
-                    continue;
-                }
-                Path path = Paths.get(f.getPath(), f.getReName());
-                Files.deleteIfExists(path);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    private void deletePhysicalFile(FoodFileUpload f) {
+        try {
+            if (f.getReName() == null) return;
+            Path root = Paths.get(uploadRootDir).toAbsolutePath().normalize();
+            Path filePath = root.resolve(f.getReName());
+            Files.deleteIfExists(filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

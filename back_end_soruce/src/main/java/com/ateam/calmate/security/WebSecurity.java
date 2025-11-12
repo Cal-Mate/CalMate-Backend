@@ -1,7 +1,9 @@
 package com.ateam.calmate.security;
 
+import com.ateam.calmate.member.command.service.RefreshTokenService;
 import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -28,11 +30,21 @@ public class WebSecurity {
 
     private JwtAuthenticationProvider jwtAuthenticationProvider;
     private Environment env;        // JWT Token의 payload에 만료시간 만들기위해 추가
+    private JwtFactory jwtFactory;
+    private CookieUtil  cookieUtil;
+    private RefreshTokenService refreshTokenService;
+    @Value("${token.refresh.expiration_time}") long refreshTtlMs;
 
     @Autowired
-    public WebSecurity(JwtAuthenticationProvider jwtAuthenticationProvider, Environment env) {
+    public WebSecurity(JwtAuthenticationProvider jwtAuthenticationProvider, Environment env,
+                       JwtFactory jwtFactory, CookieUtil  cookieUtil,
+                       RefreshTokenService refreshTokenService
+    ) {
         this.jwtAuthenticationProvider = jwtAuthenticationProvider;
         this.env = env;
+        this.jwtFactory = jwtFactory;
+        this.cookieUtil = cookieUtil;
+        this.refreshTokenService = refreshTokenService;
     }
 
     /* 설명. 새로 생성한 프로바이더 bean으로 등록 */
@@ -54,9 +66,18 @@ public class WebSecurity {
         http.authorizeHttpRequests(authz ->
                                 authz
                                         .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()     // 테스트를 위해 모든 권한 오픈
-                                        .requestMatchers("/**").permitAll()
-//                                        .requestMatchers(HttpMethod.GET, "/img/**").permitAll()     // 이미지 경로는 누구나 접근 허용
-//                                        .requestMatchers(HttpMethod.POST,"/member/member").permitAll()
+//                                        .requestMatchers("/**").permitAll()
+
+                                        /* ② 관리자만 접근 가능 (hasRole/hasAuthority) ---------- */
+                                        // hasRole("ADMIN")는 내부적으로 "ROLE_ADMIN" 권한을 찾습니다.
+                                        // DB/토큰에 "ROLE_ADMIN"을 넣었다면 hasAuthority("ROLE_ADMIN")도 동일 효과
+//                                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//
+//                                        /* ③ 로그인된 회원만 접근 가능 (authenticated) --------- */
+                                        .requestMatchers("/member/refresh").permitAll()
+                                        .requestMatchers("/member/logout").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/img/**").permitAll()     // 이미지 경로는 누구나 접근 허용
+                                        .requestMatchers("/health").permitAll()
 //                                        .requestMatchers(
 //                                                "/v3/api-docs/**",
 //                                                "/swagger-ui/**",
@@ -95,6 +116,8 @@ public class WebSecurity {
         config.setAllowedOrigins(List.of("http://localhost:5173")); // * 금지(크리덴셜 쓰면)
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
+        // 브라우저가 읽을 수 있도록 노출
+        config.setExposedHeaders(List.of("token", "Authorization"));
         config.setAllowCredentials(true); // 세션/쿠키 쓸 때
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -105,7 +128,8 @@ public class WebSecurity {
     private Filter getAuthenticationFilter(AuthenticationManager authenticationManager
             , JsonAuthFailureHandler failure
             , JsonAuthSuccessHandler  success) throws Exception {
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, env);
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, env, jwtFactory,
+                cookieUtil, refreshTokenService, refreshTtlMs);
         authenticationFilter.setAuthenticationFailureHandler(failure);
         authenticationFilter.setAuthenticationSuccessHandler(success);
         return authenticationFilter;

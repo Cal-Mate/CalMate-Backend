@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.community.query.mapper.PostMapper">
+
+    <select id="selectPostList" resultType="com.ateam.calmate.community.query.dto.PostListResponseDTO">
+        SELECT
+            p.id AS id,
+            p.title,
+            p.content,
+            DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') AS createdAt,
+            t.name AS tagName,
+            m.nickname AS authorName,
+
+            -- 대표 이미지 1개 (없으면 NULL)
+            -- 대표 이미지가 없으면 null로 떨어지며 FE에서 자동으로 숨김 처리됨
+            (SELECT pf.url
+             FROM post_file pf
+             WHERE pf.post_id = p.id
+             ORDER BY pf.created_at ASC
+                LIMIT 1) AS imageUrl,
+
+            -- 좋아요 개수
+            (SELECT COUNT(*) FROM post_like pl WHERE pl.post_id = p.id) AS likes,
+
+            -- 댓글 개수
+            (SELECT COUNT(*) FROM post_comment pc WHERE pc.post_id = p.id) AS comments
+
+        FROM post p
+            JOIN member m ON p.member_id = m.id
+            JOIN tag t ON p.tag_id = t.id
+        ORDER BY p.created_at DESC;
+    </select>
+
+</mapper>

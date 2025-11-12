@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper 인터페이스 이름/패키지와 일치시켜 주세요 -->
+<mapper namespace="com.ateam.calmate.event.query.mapper.GachaEventRepository">
+
+    <!-- 불필요하면 제거 가능. 남겨둘 경우 handler 패키지 일치 -->
+    <resultMap id="GachaEventMap" type="com.ateam.calmate.event.query.dto.gacha.GachaEventDTO">
+        <result property="metaJson"
+                column="meta_json"
+                typeHandler="com.ateam.calmate.common.JsonTypeHandler"/>
+    </resultMap>
+
+    <!-- Result Map: GachaEventDTO -->
+    <resultMap id="gachaEventResultMap" type="com.ateam.calmate.event.query.dto.gacha.GachaEventDTO">
+        <id column="id" property="id"/>
+        <result column="start_at" property="startAt"/>
+        <result column="end_at" property="endAt"/>
+        <result column="point" property="point"/>
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result column="current_board_version" property="currentBoardVersion"/>
+        <!-- 최근 스키마에 맞춰 event_id2 -> gacha_reset_id -->
+        <result column="gacha_reset_id" property="gachaResetId"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <!-- Result Map: GachaPrizeDTO -->
+    <resultMap id="gachaPrizeResultMap" type="com.ateam.calmate.event.query.dto.gacha.GachaPrizeDTO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="payload_json" property="payloadJson" typeHandler="com.ateam.calmate.common.JsonTypeHandler"/>
+        <result column="prize_type" property="prizeType" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result column="rank" property="rank"/>
+        <result column="gacha_event_id" property="gachaEventId"/>
+        <result column="quantity" property="quantity"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <!-- Result Map: GachaQuantityDTO -->
+    <resultMap id="gachaQuantityResultMap" type="com.ateam.calmate.event.query.dto.gacha.GachaQuantityDTO">
+        <id column="id" property="id"/>
+        <result column="count" property="count"/>
+    </resultMap>
+
+    <!-- Result Map: GachaResetDTO -->
+    <resultMap id="gachaResetResultMap" type="com.ateam.calmate.event.query.dto.gacha.GachaResetDTO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="policy_type" property="policyType" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result column="policy_json" property="policyJson" typeHandler="com.ateam.calmate.common.JsonTypeHandler"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <!-- Result Map: GachaSharedBoardDTO -->
+    <resultMap id="gachaSharedBoardResultMap" type="com.ateam.calmate.event.query.dto.gacha.GachaSharedBoardDTO">
+        <id column="id" property="id"/>
+        <result column="gacha_event_id" property="gachaEventId"/>
+        <result column="board_version" property="boardVersion"/>
+        <result column="row" property="row"/>
+        <result column="col" property="col"/>
+        <result column="gacha_prize_id" property="gachaPrizeId"/>
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result column="opened_by_member_id" property="openedByMemberId"/>
+        <result column="opened_at" property="openedAt"/>
+        <result column="version" property="version"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <!-- 1. 현재 활성 상태인 가챠 이벤트 조회 -->
+    <select id="findActiveGachaEvent" resultMap="gachaEventResultMap">
+        SELECT
+        id,
+        start_at,
+        end_at,
+        point,
+        status,
+        current_board_version,
+        gacha_reset_id,
+        created_at
+        FROM gacha_event
+        WHERE status = 'ACTIVE'
+        AND NOW() BETWEEN start_at AND end_at
+        LIMIT 1
+    </select>
+
+    <!-- 1-1. 이벤트 단건 조회 -->
+    <select id="findEventById" resultMap="gachaEventResultMap">
+        SELECT
+        id,
+        start_at,
+        end_at,
+        point,
+        status,
+        current_board_version,
+        gacha_reset_id,
+        created_at
+        FROM gacha_event
+        WHERE id = #{gachaEventId}
+        LIMIT 1
+    </select>
+
+    <!-- 2. 이벤트별 최고 등급(가장 작은 rank) 경품 조회 -->
+    <select id="findTopRankPrizeByEvent" resultMap="gachaPrizeResultMap">
+        SELECT
+        gp.id,
+        gp.name,
+        gp.payload_json,
+        gp.prize_type,
+        gp.rank,
+        gp.gacha_event_id,
+        gq.count AS quantity,
+        gp.created_at
+        FROM gacha_prize gp
+        LEFT JOIN gacha_quantity gq ON gq.id = gp.id
+        WHERE gp.gacha_event_id = #{gachaEventId}
+        ORDER BY rank ASC
+        LIMIT 1
+    </select>
+
+    <!-- 3. 이벤트의 현재 활성 보드 버전 조회 -->
+    <select id="findCurrentBoardVersion" resultType="java.lang.Integer">
+        SELECT COALESCE(MAX(board_version), 1)
+        FROM gacha_shared_board
+        WHERE gacha_event_id = #{gachaEventId}
+    </select>
+
+    <!-- 4. 현재 보드 버전의 모든 셀 조회 -->
+    <select id="findAllCellsByBoardVersion" resultMap="gachaSharedBoardResultMap">
+        SELECT
+        id, gacha_event_id, board_version, `row`, `col`, gacha_prize_id, status,
+        opened_by_member_id, opened_at, version, created_at, updated_at
+        FROM gacha_shared_board
+        WHERE gacha_event_id = #{gachaEventId}
+        AND board_version = #{boardVersion}
+        AND `row` BETWEEN 1 AND 10
+        AND `col` BETWEEN 1 AND 10
+        ORDER BY `row` ASC, `col` ASC
+    </select>
+
+    <!-- 5. 오픈된 셀 개수 -->
+    <select id="countOpenedCells" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM gacha_shared_board
+        WHERE gacha_event_id = #{gachaEventId}
+        AND board_version = #{boardVersion}
+        AND status = 'OPENED'
+    </select>
+
+    <!-- 6. 전체 셀 개수 -->
+    <select id="countTotalCells" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM gacha_shared_board
+        WHERE gacha_event_id = #{gachaEventId}
+        AND board_version = #{boardVersion}
+        AND `row` BETWEEN 1 AND 10
+        AND `col` BETWEEN 1 AND 10
+    </select>
+
+    <!-- 7. 경품별 남은 수량 조회 -->
+    <select id="findQuantityByPrizeId" resultMap="gachaQuantityResultMap">
+        SELECT id, count
+        FROM gacha_quantity
+        WHERE id = #{prizeId}
+    </select>
+
+    <!-- 8. 이벤트의 리셋 정책 조회 -->
+    <select id="findResetPolicyByEvent" resultMap="gachaResetResultMap">
+        SELECT
+        gr.id,
+        gr.name,
+        gr.policy_type,
+        gr.policy_json,
+        gr.created_at
+        FROM gacha_reset gr
+        INNER JOIN gacha_event ge ON gr.id = ge.gacha_reset_id
+        WHERE ge.id = #{gachaEventId}
+    </select>
+
+    <!-- 9. 이벤트의 모든 경품 조회 (등급 순서) -->
+    <select id="findAllPrizesByEventOrderByRank" resultMap="gachaPrizeResultMap">
+        SELECT
+        gp.id,
+        gp.name,
+        gp.payload_json,
+        gp.prize_type,
+        gp.rank,
+        gp.gacha_event_id,
+        gq.count AS quantity,
+        gp.created_at
+        FROM gacha_prize gp
+        LEFT JOIN gacha_quantity gq ON gq.id = gp.id
+        WHERE gp.gacha_event_id = #{gachaEventId}
+        ORDER BY rank ASC
+    </select>
+
+    <!-- 10. 특정 경품이 톱 랭크인지 확인 -->
+    <select id="checkIfTopRankPrize" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM gacha_prize
+        WHERE gacha_event_id = #{gachaEventId}
+        AND id = #{prizeId}
+        AND rank = (
+        SELECT MIN(rank)
+        FROM gacha_prize
+        WHERE gacha_event_id = #{gachaEventId}
+        )
+    </select>
+
+    <!-- 11. 이전 버전 셀들 -->
+    <select id="findPreviousBoardCells" resultMap="gachaSharedBoardResultMap">
+        SELECT
+        id, gacha_event_id, board_version, `row`, `col`, gacha_prize_id, status,
+        opened_by_member_id, opened_at, version, created_at, updated_at
+        FROM gacha_shared_board
+        WHERE gacha_event_id = #{gachaEventId}
+        AND board_version = #{boardVersion}
+        AND `row` BETWEEN 1 AND 10
+        AND `col` BETWEEN 1 AND 10
+        ORDER BY created_at DESC
+        LIMIT 100
+    </select>
+
+    <!-- 12. 리셋 정책이 TOP_RANK이고 최고 등급 경품인지 확인 -->
+    <select id="isTopRankResetPolicy" resultType="java.lang.Boolean">
+        SELECT (
+        SELECT COUNT(*)
+        FROM gacha_reset gr
+        INNER JOIN gacha_event ge ON gr.id = ge.gacha_reset_id
+        WHERE ge.id = #{gachaEventId}
+        AND (gr.name LIKE '%1등%' OR gr.name LIKE '%TOP%')
+        ) > 0
+        AND (
+        SELECT COUNT(*)
+        FROM gacha_prize
+        WHERE gacha_event_id = #{gachaEventId}
+        AND id = #{prizeId}
+        AND rank = (
+        SELECT MIN(rank)
+        FROM gacha_prize
+        WHERE gacha_event_id = #{gachaEventId}
+        )
+        ) > 0
+    </select>
+
+</mapper>

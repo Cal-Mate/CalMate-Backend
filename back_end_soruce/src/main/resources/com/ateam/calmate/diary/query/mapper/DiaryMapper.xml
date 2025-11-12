@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.diary.query.mapper.DiaryMapper">
+
+    <resultMap id="DiaryFileResultMap"
+               type="com.ateam.calmate.diary.query.dto.DiaryFileResponse">
+        <id     column="file_id"              property="id"/>
+        <result column="mime"                 property="mime"/>
+        <result column="path"                 property="path"/>
+        <result column="file_created_at"      property="createdAt"/>
+        <result column="state"                property="state"/>
+        <result column="original_file"        property="originalFile"/>
+        <result column="rename_col"           property="rename"/>
+        <result column="file_diary_id"        property="diaryId"/>
+        <result column="extend_file_path_id"  property="extendFilePathId"/>
+    </resultMap>
+
+    <resultMap id="DiaryResultMap"
+               type="com.ateam.calmate.diary.query.dto.DiaryResponse">
+        <id     column="diary_id"    property="id"/>
+        <result column="day"         property="day"/>
+        <result column="weight"      property="weight"/>
+        <result column="mood"        property="mood"/>
+        <result column="condition"   property="condition"/>
+        <result column="memo"        property="memo"/>
+        <result column="member_id"   property="memberId"/>
+
+        <collection property="files"
+                    ofType="com.ateam.calmate.diary.query.dto.DiaryFileResponse"
+                    resultMap="DiaryFileResultMap"/>
+    </resultMap>
+
+    <!-- 목록 조회 -->
+    <select id="selectDiaryList" resultMap="DiaryResultMap">
+        SELECT
+        d.id                  AS diary_id,
+        d.day                 AS day,
+        d.weight              AS weight,
+        d.mood                AS mood,
+        d.`condition`         AS `condition`,
+        d.memo                AS memo,
+        d.member_id           AS member_id,
+        df.id                 AS file_id,
+        df.mime               AS mime,
+        df.path               AS path,
+        df.created_at         AS file_created_at,
+        df.state              AS state,
+        df.original_file      AS original_file,
+        df.`rename`           AS rename_col,
+        df.diary_id           AS file_diary_id,
+        df.extend_file_path_id AS extend_file_path_id
+        FROM diary d
+        LEFT JOIN diary_file df ON d.id = df.diary_id
+        <where>
+            <if test="memberId != null">
+                d.member_id = #{memberId}
+            </if>
+        </where>
+        ORDER BY d.day DESC, d.id DESC, df.created_at ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 날짜별 조회 -->
+    <select id="selectDiaryListByMemberAndDay" resultMap="DiaryResultMap">
+        SELECT
+        d.id                  AS diary_id,
+        d.day                 AS day,
+        d.weight              AS weight,
+        d.mood                AS mood,
+        d.`condition`         AS `condition`,
+        d.memo                AS memo,
+        d.member_id           AS member_id,
+        df.id                 AS file_id,
+        df.mime               AS mime,
+        df.path               AS path,
+        df.created_at         AS file_created_at,
+        df.state              AS state,
+        df.original_file      AS original_file,
+        df.`rename`           AS rename_col,
+        df.diary_id           AS file_diary_id,
+        df.extend_file_path_id AS extend_file_path_id
+        FROM diary d
+        LEFT JOIN diary_file df ON d.id = df.diary_id
+        <where>
+            DATE(d.day) = #{day}
+            <if test="memberId != null">
+                AND d.member_id = #{memberId}
+            </if>
+        </where>
+        ORDER BY d.day DESC, d.id DESC, df.created_at ASC
+    </select>
+
+    <!-- 상세 조회 -->
+    <select id="selectDiaryDetail" resultMap="DiaryResultMap">
+        SELECT
+        d.id                  AS diary_id,
+        d.day                 AS day,
+        d.weight              AS weight,
+        d.mood                AS mood,
+        d.`condition`         AS `condition`,
+        d.memo                AS memo,
+        d.member_id           AS member_id,
+        df.id                 AS file_id,
+        df.mime               AS mime,
+        df.path               AS path,
+        df.created_at         AS file_created_at,
+        df.state              AS state,
+        df.original_file      AS original_file,
+        df.`rename`           AS rename_col,
+        df.diary_id           AS file_diary_id,
+        df.extend_file_path_id AS extend_file_path_id
+        FROM diary d
+        LEFT JOIN diary_file df ON d.id = df.diary_id
+        WHERE d.id = #{diaryId}
+        <if test="memberId != null">
+            AND d.member_id = #{memberId}
+        </if>
+        ORDER BY df.created_at ASC
+    </select>
+
+</mapper>

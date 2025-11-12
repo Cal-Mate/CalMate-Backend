@@ -3,61 +3,74 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ateam.calmate.member.query.mapper.MemberQueryRepository">
-    <resultMap id="blackListResultMap" type="com.ateam.calmate.member.query.dto.BlackListDTO">
-        <id property="id" column="id"/>
-        <result property="createDate" column="createDate"/>
-        <result property="adminId" column="adminId"/>
-        <result property="memberId" column="memberId"/>
-    </resultMap>
 
 
     <resultMap id="selectByIdWithAuthoritiesResultMap"
                type="com.ateam.calmate.member.query.dto.RequestLoginwithAuthoritiesDTO">
         <id property="id" column="id"/>
         <result property="email" column="email"/>
-        <result property="memberName" column="memName"/>
-        <result property="memStsId" column="memStsId"/>
+        <result property="memberName" column="name"/>
+        <result property="memStsId" column="status"/>
+        <result property="nickName" column="nickname"/>
+        <result property="phone" column="phone"/>
         <result property="birth" column="birth"/>
-        <result property="loginLockUntil" column="loginLockUntil"/>
-        <result property="crewId" column="crewId"/>
-        <result property="loginFailCnt" column="loginFailCnt"/>
-        <result property="pwd" column="memPwd"/>
+        <result property="gender" column="gender"/>
+        <result property="loginLockUntil" column="login_lock_until"/>
+        <result property="loginFailCnt" column="login_failure_count"/>
+        <result property="pwd" column="pw"/>
+        <result property="bodyMetric" column="body_metric"/>
+        <result property="height" column="height"/>
+        <result property="weight" column="weight"/>
         <collection property="authorities" ofType="com.ateam.calmate.member.query.dto.Authority">
-            <result property="cumId" column="cumId"/>
-            <result property="authId" column="authId"/>
-            <result property="authName" column="authName"/>
-            <result property="authDescribe" column="authDescribe"/>
+            <result property="memberId" column="member_id"/>
+            <result property="authId" column="authories_id"/>
+            <result property="authName" column="authurity"/>
+            <result property="authDescribe" column="description"/>
         </collection>
     </resultMap>
 
-    <select id="selectBlackListByMember" parameterType="_long" resultMap="blackListResultMap">
-        SELECT
-               a.id
-             , a.createDate
-             , a.adminId
-             , a.memberId
-          FROM Blacklist a
-         WHERE a.memberId = #{id}
-    </select>
+    <resultMap id="blackListResultMap" type="com.ateam.calmate.member.query.dto.BlackListDTO">
+        <id property="memberId" column="member_id"/>
+        <result property="createDate" column="create_date"/>
+        <result property="adminId" column="admin_id"/>
+    </resultMap>
+
     <select id="selectByIdWithAuthorite" parameterType="string" resultMap="selectByIdWithAuthoritiesResultMap">
         SELECT
                a.id
              , a.email
-             , a.memName
+             , a.name
+             , a.nickname
              , a.birth
-             , a.memStsId
-             , a.memPwd
-             , a.loginFailCnt
-             , a.loginLockUntil
-             , a.crewId
-             , b.cumId
-             , b.authId
-             , c.authName
-             , c.authDescribe
+             , a.status
+             , a.pw
+             , a.login_failure_count
+             , a.login_lock_until
+             , a.phone
+             , a.height
+             , a.weight
+             , a.gender
+             , a.body_metric
+             , b.member_id
+             , b.authories_id
+             , c.authurity
+             , c.description
           FROM member a
-          JOIN memberAuthority b on a.id = b.cumId
-          JOIN authorityList c on b.authId = c.id
+          JOIN member_authority b on a.id = b.member_id
+          JOIN authorites c on b.authories_id = c.id
          WHERE a.email = #{email}
     </select>
+
+
+
+    <select id="selectBlackListByMember" parameterType="_long" resultMap="blackListResultMap">
+        SELECT
+               a.member_id
+             , a.create_date
+             , a.admin_id
+        FROM black_list a
+        WHERE a.member_id = #{id}
+    </select>
+
 
 </mapper>
