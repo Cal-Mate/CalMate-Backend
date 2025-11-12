@@ -8,6 +8,8 @@ import java.util.List;
 public class PostDetailDTO {
     private int id;
     private String title;
+    private Long memberId;     // ✅ 게시글 작성자 memberId
+
     private String authorName;
     private String createdAt;
     private String tagName;

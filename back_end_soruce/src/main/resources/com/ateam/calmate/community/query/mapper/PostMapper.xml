@@ -9,6 +9,7 @@
             p.id AS id,
             p.title,
             p.content,
+            p.member_id AS memberId,                <!-- ✅ 게시글 작성자 memberId 추가 -->
             DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') AS createdAt,
             t.name AS tagName,
             m.nickname AS authorName,

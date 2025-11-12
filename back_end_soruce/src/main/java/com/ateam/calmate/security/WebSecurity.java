@@ -78,6 +78,26 @@ public class WebSecurity {
                                         .requestMatchers("/member/logout").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/img/**").permitAll()     // 이미지 경로는 누구나 접근 허용
                                         .requestMatchers("/health").permitAll()
+
+                                        // 커뮤니티 조회는 모두 허용
+                                        .requestMatchers(HttpMethod.GET, "/community/posts").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/community/post/*").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/community/post/*/comments").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/community/ranking").permitAll()
+
+                                        // 커뮤니티 댓글 (작성/수정/삭제)
+                                        .requestMatchers(HttpMethod.POST, "/community/post/*/comments").authenticated()
+                                        .requestMatchers(HttpMethod.PATCH, "/community/post/*/comments/*").authenticated()
+                                        .requestMatchers(HttpMethod.DELETE, "/community/post/*/comments/*").authenticated()
+
+                                        // 게시글 (작성/수정/삭제)
+                                        .requestMatchers(HttpMethod.POST, "/community/post").authenticated()     // 토큰때문에 안되면 permitAll()로 수정
+                                        .requestMatchers(HttpMethod.PATCH, "/community/post/*").authenticated()  // 토큰때문에 안되면 permitAll()로 수정
+                                        .requestMatchers(HttpMethod.DELETE, "/community/post/*").authenticated() // 토큰때문에 안되면 permitAll()로 수정
+
+                                        // 게시글 및 댓글 좋아요
+                                        .requestMatchers(HttpMethod.POST, "/community/post/*/like").authenticated()
+                                        .requestMatchers(HttpMethod.POST, "/community/comment/*/like").authenticated()
 //                                        .requestMatchers(
 //                                                "/v3/api-docs/**",
 //                                                "/swagger-ui/**",

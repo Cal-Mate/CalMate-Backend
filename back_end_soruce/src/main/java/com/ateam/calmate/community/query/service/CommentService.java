@@ -3,6 +3,7 @@ package com.ateam.calmate.community.query.service;
 import com.ateam.calmate.community.query.dto.CommentResponseDTO;
 import com.ateam.calmate.community.query.mapper.CommentMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -42,13 +43,38 @@ public class CommentService {
     }
 
 
-    // ✅ 댓글 수정
-    public void updateComment(int commentId, String content) {
+//    // ✅ 댓글 수정
+//    public void updateComment(int commentId, String content) {
+//        commentMapper.updateComment(commentId, content);
+//    }
+//
+//
+//    // ✅ 댓글 삭제
+//    public void deleteComment(int commentId) {
+//        commentMapper.deleteComment(commentId);
+//    }
+
+    // ✅ 댓글 수정 (작성자 검증 추가)
+    public void updateComment(int commentId, int memberId, String content) {
+        Long authorId = commentMapper.findAuthorIdByCommentId(commentId);
+        if (authorId == null) {
+            throw new IllegalStateException("댓글이 존재하지 않습니다.");
+        }
+        if (!authorId.equals((long) memberId)) {
+            throw new AccessDeniedException("본인만 댓글을 수정할 수 있습니다.");
+        }
         commentMapper.updateComment(commentId, content);
     }
 
-    // ✅ 댓글 삭제
-    public void deleteComment(int commentId) {
+    // ✅ 댓글 삭제 (작성자 검증 추가)
+    public void deleteComment(int commentId, int memberId) {
+        Long authorId = commentMapper.findAuthorIdByCommentId(commentId);
+//        System.out.println("삭제 요청자: " + memberId + ", 댓글 작성자: " + authorId);
+
+        if (authorId == null) throw new IllegalStateException("댓글이 존재하지 않습니다.");
+        if (!authorId.equals((long) memberId)) {
+            throw new AccessDeniedException("본인만 댓글을 삭제할 수 있습니다.");
+        }
         commentMapper.deleteComment(commentId);
     }
 

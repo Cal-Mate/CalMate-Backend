@@ -11,6 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PostListResponseDTO {
     private int id;
+    private Long memberId;     // ✅ 게시글 작성자 memberId
+
     private String title;
     private String content;
     private String createdAt;

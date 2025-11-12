@@ -9,6 +9,8 @@ public class CommentResponseDTO {
     private int id;
     private int postId;
     private String authorName;   // member.nickname
+    private int memberId;         // ✅ 추가
+
     private String content;
     private String createdAt;    // create_at -> alias
     private Integer parentId;    // member_parent_comment_id -> alias

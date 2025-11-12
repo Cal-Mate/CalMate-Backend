@@ -22,4 +22,7 @@ public interface CommentMapper {
 
     // ✅ 댓글 삭제
     void deleteComment(@Param("commentId") int commentId);
+
+    // ✅ 댓글 작성자 ID 조회용
+    Long findAuthorIdByCommentId(@Param("commentId") int commentId);
 }
