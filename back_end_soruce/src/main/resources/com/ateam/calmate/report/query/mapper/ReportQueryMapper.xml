@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ateam.calmate.report.query.mapper.ReportQueryMapper">
+
+    <sql id="reportWhere">
+        <where>
+            <if test="cond.status != null">
+                r.yn = #{cond.status}
+            </if>
+            <if test="cond.typeKeyword != null and cond.typeKeyword != ''">
+                <if test="cond.status != null">AND</if>
+                rb.title LIKE CONCAT('%', #{cond.typeKeyword}, '%')
+            </if>
+            <if test="cond.keyword != null and cond.keyword != ''">
+                <if test="cond.status != null or (cond.typeKeyword != null and cond.typeKeyword != '')">AND</if>
+                (
+                r.title LIKE CONCAT('%', #{cond.keyword}, '%')
+                OR reporter.name LIKE CONCAT('%', #{cond.keyword}, '%')
+                OR reported.name LIKE CONCAT('%', #{cond.keyword}, '%')
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="countReports" parameterType="map" resultType="long">
+        SELECT COUNT(1)
+        FROM report r
+        LEFT JOIN report_base rb ON rb.id = r.report_base_id
+        LEFT JOIN member reporter ON reporter.id = r.member_id
+        LEFT JOIN member reported ON reported.id = r.member_id2
+        <include refid="reportWhere"/>
+    </select>
+
+    <select id="findReports" parameterType="map"
+            resultType="com.ateam.calmate.report.query.dto.ReportListItemDto">
+        SELECT
+        r.id,
+        r.title,
+        r.yn,
+        r.`date`,
+        r.member_id   AS reporterId,
+        reporter.name AS reporterName,
+        r.member_id2  AS reportedId,
+        reported.name AS reportedName,
+        r.post_id     AS postId,
+        r.comment_id  AS commentId,
+        r.report_image_url AS reportImageUrl,
+        rb.title      AS reportBaseTitle
+        FROM report r
+        LEFT JOIN report_base rb ON rb.id = r.report_base_id
+        LEFT JOIN member reporter ON reporter.id = r.member_id
+        LEFT JOIN member reported ON reported.id = r.member_id2
+        <include refid="reportWhere"/>
+        ORDER BY r.id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="findReportDetail" parameterType="long"
+            resultType="com.ateam.calmate.report.query.dto.ReportDetailDto">
+        SELECT
+            r.id,
+            r.title,
+            r.contents,
+            r.yn,
+            r.`date`,
+            r.member_id         AS reporterId,
+            reporter.name       AS reporterName,
+            r.member_id2        AS reportedId,
+            reported.name       AS reportedName,
+            r.post_id           AS postId,
+            r.comment_id        AS commentId,
+            r.admin_id          AS adminId,
+            r.report_base_id    AS reportBaseId,
+            r.report_base_title AS reportBaseTitle,
+            r.required_count    AS requiredCount,
+            r.ban_days          AS banDays,
+            r.report_image_url  AS reportImageUrl
+        FROM report r
+                 LEFT JOIN member reporter ON reporter.id = r.member_id
+                 LEFT JOIN member reported ON reported.id = r.member_id2
+        WHERE r.id = #{id}
+    </select>
+
+    <select id="findReportFiles" parameterType="long"
+            resultType="com.ateam.calmate.report.query.dto.ReportFileDto">
+        SELECT
+            f.id,
+            f.name,
+            f.`type`,
+            f.re_name       AS reName,
+            f.path,
+            f.thumb_path    AS thumbPath,
+            f.upload_order  AS uploadOrder
+        FROM report_fileupload f
+        WHERE f.report_id = #{reportId}
+        ORDER BY f.upload_order ASC, f.id ASC
+    </select>
+
+</mapper>

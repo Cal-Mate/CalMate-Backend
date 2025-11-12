@@ -8,13 +8,17 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "extend_file_path")
-public class ReportExtendFilePath {
+@Table(name = "report_base")
+public class ReportBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "url_path")
-    private String urlPath;
+    private String title;
+
+    private Integer count;
+
+    @Column(name = "day_of_ban")
+    private Integer dayOfBan;
 }
