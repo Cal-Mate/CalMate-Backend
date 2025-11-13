@@ -5,7 +5,8 @@ spring:
     name: member-client
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://cal-mate-mariadb-ser:3310/cal_mate?&rewriteBatchedStatements=true
+    url: jdbc:mariadb://cal-mate.iptime.org:15161/cal_mate?&rewriteBatchedStatements=true
+#    url: jdbc:mariadb://cal-mate-mariadb-ser:3310/cal_mate?&rewriteBatchedStatements=true
     username: cal_mate
     password: cal123123
     hikari:

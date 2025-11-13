@@ -134,8 +134,10 @@ public class WebSecurity {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
-                "http://localhost:*",                   // 로컬 개발
-                "http://cal-mate.iptime.org:*" ));       // 외부 접속 (포트 포함) // * 금지(크리덴셜 쓰면)
+                "http://localhost",                 // 실제로는 :80
+                "http://localhost:5173",            // dev 포트
+                "http://cal-mate.iptime.org",       // 80 쓴다면
+                "http://cal-mate.iptime.org:18888"));  // 현재 외부 포트)); // * 금지(크리덴셜 쓰면)
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         // 브라우저가 읽을 수 있도록 노출
