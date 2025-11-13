@@ -358,13 +358,13 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
 
 
-        MemberGoal memberGoal = goalRepository.findByMemberId(modifiedData.getId());
-
-        if(memberGoal == null)
-            memberGoal = modelMapper.map(modifiedData, MemberGoal.class);
-
-        memberGoal.setGoalType(modifiedData.getGoalType());
-        memberGoal.setEndDate(modifiedData.getEndDate());
+//        MemberGoal memberGoal = goalRepository.findByMemberId(modifiedData.getId());
+//
+//        if(memberGoal == null)
+//            memberGoal = modelMapper.map(modifiedData, MemberGoal.class);
+//
+//        memberGoal.setGoalType(modifiedData.getGoalType());
+//        memberGoal.setEndDate(modifiedData.getEndDate());
 
 
 
