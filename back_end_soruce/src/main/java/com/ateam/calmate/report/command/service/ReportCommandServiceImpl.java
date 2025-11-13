@@ -42,15 +42,27 @@ public class ReportCommandServiceImpl implements ReportCommandService {
         ReportBase base = reportBaseRepository.findById(request.getReportBaseId())
                 .orElseThrow(() -> new IllegalArgumentException("report base not found"));
 
+        // ✅ 댓글 신고면 commentId만, 게시물 신고면 postId만 세팅
+        Long postId = null;
+        Long commentId = null;
+
+        if (request.getCommentId() != null) {
+            // 댓글 신고
+            commentId = optLong(request.getCommentId());
+        } else {
+            // 게시물 신고
+            postId = optLong(request.getPostId());
+        }
+
         Report report = Report.builder()
                 .title(request.getTitle())
                 .contents(request.getContents())
                 .yn(false)
                 .date(LocalDateTime.now())
-                .memberId(request.getReporterMemberId())
-                .memberId2(request.getReportedMemberId())
-                .postId(optLong(request.getPostId()))
-                .commentId(optLong(request.getCommentId()))
+                .memberId(request.getReporterMemberId())     // 신고자
+                .memberId2(request.getReportedMemberId())    // 피신고자
+                .postId(postId)                              // 댓글 신고면 null
+                .commentId(commentId)                        // 게시물 신고면 null
                 .reportId(base.getId())
                 .build();
 
@@ -83,31 +95,37 @@ public class ReportCommandServiceImpl implements ReportCommandService {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("report not found"));
 
+        // 이미 처리된 신고면 종료
         if (Boolean.TRUE.equals(report.getYn())) return;
 
         report.setYn(true);
         reportRepository.save(report);
 
+        // 신고 당한 회원 상태 변경
         Member reported = memberRepository.findById(report.getMemberId2())
                 .orElseThrow(() -> new IllegalArgumentException("member not found"));
 
         reported.setStatus(3L);
         memberRepository.save(reported);
 
-        // 게시글 신고
-        if (report.getPostId() != null) {
-            reportPostRepository.findById(report.getPostId()).ifPresent(post -> {
-                post.setVisibility(1);
-                reportPostRepository.save(post);
-            });
-        }
-
-        // 댓글 신고
+        // ✅ 댓글 신고면 댓글만 visibility +1
         if (report.getCommentId() != null) {
             reportCommentRepository.findById(report.getCommentId().intValue())
                     .ifPresent(comment -> {
-                        comment.setVisibility(1);
+                        Integer current = comment.getVisibility();
+                        if (current == null) current = 0;
+                        comment.setVisibility(current + 1);
                         reportCommentRepository.save(comment);
+                    });
+
+            // ✅ 게시글 신고면 게시글만 visibility +1
+        } else if (report.getPostId() != null) {
+            reportPostRepository.findById(report.getPostId())
+                    .ifPresent(post -> {
+                        Integer current = post.getVisibility();
+                        if (current == null) current = 0;
+                        post.setVisibility(current + 1);
+                        reportPostRepository.save(post);
                     });
         }
     }
