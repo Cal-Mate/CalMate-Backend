@@ -12,7 +12,6 @@ public class PostDetailDTO {
 
     private String authorName;
     private String createdAt;
-    private Integer visibility;
     private String tagName;
     private String content;
     private List<String> images;  // ✅ 단일 → 배열

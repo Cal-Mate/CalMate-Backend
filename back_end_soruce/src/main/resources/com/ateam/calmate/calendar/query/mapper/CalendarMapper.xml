@@ -51,15 +51,6 @@
     </select>
 
 
-    <!-- 기간별 뱃지 개수 합계 조회 -->
-    <select id="selectBadgeCountByRange" resultType="int">
-        SELECT COALESCE(SUM(c.badge_yn), 0)
-        FROM calendar c
-        WHERE c.member_id = #{memberId}
-          AND c.cal_day BETWEEN #{startDate} AND #{endDate}
-    </select>
-
-    <!-- 전체(누적) 뱃지 개수 합계 조회 -->
     <select id="selectTotalBadgeCountByMember" resultType="int">
         SELECT COALESCE(SUM(c.badge_yn), 0)
         FROM calendar c

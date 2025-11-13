@@ -17,7 +17,6 @@ public class CommentResponseDTO {
 
     private long likeCount;   // ✅ 추가
     private boolean liked;    // ✅ 추가
-    private Integer visibility;
 
 
     private List<CommentResponseDTO> replies = new ArrayList<>();

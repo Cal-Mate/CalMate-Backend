@@ -6,9 +6,6 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -18,42 +15,28 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String baseDir = System.getProperty("user.dir");
-        Path currentDir = Paths.get(baseDir).toAbsolutePath().normalize();
-        boolean runningFromModule = currentDir.getFileName().toString().equals("back_end_soruce");
-        Path backendDir = runningFromModule ? currentDir : currentDir.resolve("back_end_soruce");
-        Path repoRootDir = runningFromModule && currentDir.getParent() != null
-                ? currentDir.getParent()
-                : currentDir;
 
         // 프로필 단건 이미지
         registry.addResourceHandler("/img/single/**")
-                .addResourceLocations("file:" + backendDir.toString() + "/img/single/");
+                .addResourceLocations("file:" + baseDir + "/img/single/");
 
         // 프로필 업로드 경로 (ex: /uploads/profile/)
         registry.addResourceHandler(profileDirPath + "**")
-                .addResourceLocations("file:" + backendDir.toString() + profileDirPath);
+                .addResourceLocations("file:" + System.getProperty("user.dir") + profileDirPath);
 
         registry.addResourceHandler("/img/meal/**")
-                .addResourceLocations("file:" + backendDir.toString() + "/img/meal/");
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/meal/");
 
         registry.addResourceHandler("/img/exercise/**")
-                .addResourceLocations("file:" + backendDir.toString() + "/img/exercise/");
-
-        registry.addResourceHandler("/img/diary/**")
-                .addResourceLocations("file:" + backendDir.toString() + "/img/diary/");
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/exercise/");
 
         // (게시판 이미지, 식단 업로드 이미지, exercise 등)
         registry.addResourceHandler("/img/community/**")
-                .addResourceLocations("file:" + backendDir.toString() + "/img/community/");
-
-        // Bingo 및 일반 업로드 파일을 모두 /uploads/** 로 노출
-        String bingoUploadDir = backendDir.resolve("img/event/").toUri().toString();
-        String legacyUploadsDir = repoRootDir.resolve("uploads/").toUri().toString();
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations(bingoUploadDir, legacyUploadsDir);
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/community/");
 
         registry.addResourceHandler("/img/report/**")
-                .addResourceLocations("file:" + backendDir.toString() + "/img/report/");
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/report/");
+
     }
 
     @Override

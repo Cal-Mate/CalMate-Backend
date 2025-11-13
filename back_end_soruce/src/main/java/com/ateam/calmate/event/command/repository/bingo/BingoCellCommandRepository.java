@@ -15,11 +15,6 @@ public interface BingoCellCommandRepository extends JpaRepository<BingoCellEntit
     @Query("select c from BingoCellEntity c join fetch c.board where c.id = :id")
     Optional<BingoCellEntity> findByIdForUpdate(@Param("id") Integer id);
 
-    @Lock(LockModeType.PESSIMISTIC_READ)
     @Query("select c from BingoCellEntity c where c.board.id = :boardId")
     List<BingoCellEntity> findAllByBoardId(@Param("boardId") Integer boardId);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select c from BingoCellEntity c where c.board.id = :boardId")
-    List<BingoCellEntity> findAllByBoardIdForUpdate(@Param("boardId") Integer boardId);
 }
