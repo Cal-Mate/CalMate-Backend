@@ -132,7 +132,7 @@ public class PostCommandService {
         try {
             String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
 
-            String folderPath = System.getProperty("user.dir") + "/img/community/";
+            String folderPath = System.getProperty("user.dir") + "/back_end_soruce/img/community/";
             File folder = new File(folderPath);
             if (!folder.exists()) folder.mkdirs();
 

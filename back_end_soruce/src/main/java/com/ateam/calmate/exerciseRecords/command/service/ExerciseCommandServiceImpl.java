@@ -34,7 +34,7 @@ public class ExerciseCommandServiceImpl implements ExerciseCommandService {
     private final ExercisePointService exercisePointService;   // ✅ 포인트 서비스 주입
 
     private final Path exerciseRootDir =
-            Paths.get(System.getProperty("user.dir"), "img", "exercise");
+            Paths.get(System.getProperty("user.dir"), "back_end_soruce", "img", "exercise");
 
     @Override
     public Long createExercise(ExerciseRequest request, List<MultipartFile> files) throws IOException {
