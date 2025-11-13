@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SqlDialectMappings">
-    <file url="file://$USER_HOME$/callMate-SQL/DDL+제약조건.sql" dialect="MariaDB" />
-    <file url="file://$USER_HOME$/callMate-SQL/DML.sql" dialect="MariaDB" />
-  </component>
-</project>

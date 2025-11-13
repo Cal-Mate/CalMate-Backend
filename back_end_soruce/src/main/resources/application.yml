@@ -5,9 +5,9 @@ spring:
     name: member-client
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/calmate
-    username: swcamp
-    password: swcamp
+    url: jdbc:mariadb://localhost:3306/calmate?&rewriteBatchedStatements=true
+    username: root
+    password: mariadb
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -42,13 +42,12 @@ logging:
     com:
       ohgiraffers:
         springdatajpa: debug
-
-
+        org.hibernate.SQL: debug
+        org.hibernate.orm.jdbc.bind: trace
 token:
   access:
     secret: v7o98gdK42iddFqTxH07Yjv18KbwIZWQZu7NRPeR9+ji9tOGDX2r8PO3mGptklEdEiIB0RMT066q3qb19YBfqQ==
-    #    expiration_time: 600000 # 10 분
-    expiration_time: 6000 # 10 분
+    expiration_time: 600000 # 10 분
   refresh:
     secret: QUohbgcqwRhk+Xi7zbhgWrkGA0SFRI6OIjzjOsPMtXN5G6RtwBuX0UKENxM07M9WRQBnSuvmU3J4GEpPzqWj/w==
     expiration_time: 86400000 # 1 일 [ms] 단위

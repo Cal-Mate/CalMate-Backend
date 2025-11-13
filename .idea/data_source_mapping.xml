@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="DataSourcePerFileMappings">
-    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/5147d490-2832-4cf0-b3d0-f1a39abfcc25/console.sql" value="5147d490-2832-4cf0-b3d0-f1a39abfcc25" />
-    <file url="file://$USER_HOME$/callMate-SQL/DDL+제약조건.sql" value="5147d490-2832-4cf0-b3d0-f1a39abfcc25" />
-    <file url="file://$USER_HOME$/callMate-SQL/DML.sql" value="5147d490-2832-4cf0-b3d0-f1a39abfcc25" />
-  </component>
-</project>
