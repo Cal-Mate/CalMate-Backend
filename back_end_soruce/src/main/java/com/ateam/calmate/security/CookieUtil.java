@@ -16,8 +16,8 @@ public class CookieUtil {
     public ResponseCookie createRefreshCookie(String value, long maxAgeSeconds, String domain) {
         return ResponseCookie.from(REFRESH_COOKIE, value)        // 쿠키 이름과 값 설정
                 .httpOnly(true)                                  // JS에서 접근 불가 → XSS로 읽기 차단
-                .secure(true)                                    // HTTPS에서만 전송
-                .sameSite("Strict")                              // 교차사이트 자동 전송 차단(강한 CSRF 방어)
+//                .secure(true)                                    // HTTPS에서만 전송
+                .sameSite("Lax")                              // 교차사이트 자동 전송 차단(강한 CSRF 방어)
                 .path("/")                                       // 전체 경로에 대해 유효
                 .domain(domain)                                  // 필요 시 서브도메인 공용 설정
                 .maxAge(maxAgeSeconds)                           // 만료(브라우저 저장형)
@@ -29,8 +29,8 @@ public class CookieUtil {
     public ResponseCookie createRefreshCookie(String value) {
         return ResponseCookie.from(REFRESH_COOKIE, value)        // 쿠키 이름과 값 설정
                 .httpOnly(true)                                  // JS에서 접근 불가 → XSS로 읽기 차단
-                .secure(true)                                    // HTTPS에서만 전송
-                .sameSite("Strict")                              // 교차사이트 자동 전송 차단(강한 CSRF 방어)
+//                .secure(true)                                    // HTTPS에서만 전송
+                .sameSite("Lax")                              // 교차사이트 자동 전송 차단(강한 CSRF 방어)
                 .path("/")                                       // 전체 경로에 대해 유효
                 .build();
     }
@@ -38,7 +38,9 @@ public class CookieUtil {
     // 쿠키 삭제(로그아웃 시)
     public ResponseCookie deleteRefreshCookie() {
         return ResponseCookie.from(REFRESH_COOKIE, "")
-                .httpOnly(true).secure(true).sameSite("Strict")
+                .httpOnly(true)
+//                .secure(true)
+                .sameSite("Lax")
                 .path("/").maxAge(0)              // maxAge=0 → 즉시 만료
                 .build();
     }
@@ -47,8 +49,12 @@ public class CookieUtil {
     // 쿠키 삭제(로그아웃 시)
     public ResponseCookie deleteRefreshCookie(String domain) {
         return ResponseCookie.from(REFRESH_COOKIE, "")
-                .httpOnly(true).secure(true).sameSite("Strict")
-                .path("/").domain(domain).maxAge(0)              // maxAge=0 → 즉시 만료
+                .httpOnly(true)
+//                .secure(true)
+                .sameSite("Lax")
+                .path("/")
+                .domain(domain)
+                .maxAge(0)              // maxAge=0 → 즉시 만료
                 .build();
     }
 }

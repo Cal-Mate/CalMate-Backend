@@ -138,7 +138,11 @@ public class WebSecurity {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost",                 // 실제로는 :80
+                "http://localhost:5173",            // dev 포트
+                "http://cal-mate.iptime.org",       // 80 쓴다면
+                "http://cal-mate.iptime.org:18888"));  // 현재 외부 포트)); // * 금지(크리덴셜 쓰면)
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 
