@@ -32,4 +32,6 @@ public interface MemberService {
     boolean modifyPassword(ModifyPasswordDTO modifyPasswordDTO);
 
     void calculatePoint(Long member_id, int id);
+
+    void modifyOfData(RequestModifyDTO modifiedData);
 }

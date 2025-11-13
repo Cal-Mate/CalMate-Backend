@@ -19,7 +19,7 @@ public class ProfileImageService {
     public ProfileImageService(@Value("${profile.dirPath}") String dirPath) {
 
         this.dirPath = dirPath;
-        uploadDir = System.getProperty("user.dir").replace("\\","/") + dirPath;
+        uploadDir = System.getProperty("user.dir") + dirPath;
     }
 
     public ResponseProfileImageDTO updateProfileImage(MultipartFile singleFile, Long id, HttpServletRequest req) throws IOException {
@@ -39,11 +39,11 @@ public class ProfileImageService {
         String serverName = req.getServerName(); // localhost
         int port = req.getServerPort();          // 8000
         String requestPath = scheme + "://" + serverName +  ":" + port;
-        String urlImagePath = requestPath + dirPath +  reName;
+        String urlImagePath = dirPath +  reName;
 
         String mimeType = singleFile.getContentType();
         ResponseProfileImageDTO responseProfileImageDTO
-                = new ResponseProfileImageDTO(id ,mimeType, uploadDir,"ACTIVE", originFileName
+                = new ResponseProfileImageDTO(id ,mimeType, dirPath,"ACTIVE", originFileName
                 ,reName,1L, urlImagePath, true,"");
 
         return responseProfileImageDTO;
