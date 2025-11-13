@@ -5,9 +5,10 @@ spring:
     name: member-client
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/calmate
-    username: swcamp
-    password: swcamp
+    url: jdbc:mariadb://cal-mate.iptime.org:15161/cal_mate?&rewriteBatchedStatements=true
+    #    url: jdbc:mariadb://cal-mate-mariadb-ser:3310/cal_mate?&rewriteBatchedStatements=true
+    username: cal_mate
+    password: cal123123
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -34,7 +35,7 @@ spring:
       max-request-size: 200MB      # 업로드 요청당 총 용량(default 10MB)
   web:
     resources:
-      static-locations: file:./img/,file:./uploads/     # 정적 리소스 경로 (상대 경로)
+      static-locations: file:./back_end_soruce/img/,file:./uploads/     # 정적 리소스 경로 (상대 경로)
       cache-period: 3600                                 # 웹 브라우저의 캐싱 시간(초, 1시간)
 
 logging:
@@ -76,8 +77,8 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
-# 프로필 이지미 관련 경로
+# 프로필 이미지 관련 경로
 profile:
-  dirPath: /img/profile/
+  dirPath: /back_end_soruce/img/profile/
 
 

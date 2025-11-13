@@ -29,7 +29,7 @@ public class MealCommandServiceImpl implements MealCommandService {
     private final FoodExtendFilePathRepository extendFilePathRepository;
     private final MealPointService mealPointService; // ✅ 포인트 서비스
 
-    private final String uploadRootDir = "img/meal";
+    private final String uploadRootDir = "back_end_soruce/img/meal";
 
     @Override
     public Long createMeal(MealRequest request, List<MultipartFile> files) {
@@ -151,7 +151,7 @@ public class MealCommandServiceImpl implements MealCommandService {
             String ext = StringUtils.getFilenameExtension(originalName);
             String storeName = UUID.randomUUID() + (ext != null ? "." + ext : "");
 
-            Path root = Paths.get(uploadRootDir).toAbsolutePath().normalize();
+            Path root = Paths.get(System.getProperty("user.dir"), uploadRootDir).toAbsolutePath().normalize();
             Files.createDirectories(root);
 
             Path filePath = root.resolve(storeName);
@@ -183,7 +183,7 @@ public class MealCommandServiceImpl implements MealCommandService {
     private void deletePhysicalFile(FoodFileUpload f) {
         try {
             if (f.getReName() == null) return;
-            Path root = Paths.get(uploadRootDir).toAbsolutePath().normalize();
+            Path root = Paths.get(System.getProperty("user.dir"), uploadRootDir).toAbsolutePath().normalize();
             Path filePath = root.resolve(f.getReName());
             Files.deleteIfExists(filePath);
         } catch (Exception e) {

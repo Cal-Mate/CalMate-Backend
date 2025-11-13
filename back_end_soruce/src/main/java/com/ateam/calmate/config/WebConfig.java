@@ -44,7 +44,10 @@ public class WebConfig implements WebMvcConfigurer {
 
         // (게시판 이미지, 식단 업로드 이미지, exercise 등)
         registry.addResourceHandler("/img/community/**")
-                .addResourceLocations("file:" + backendDir.toString() + "/img/community/");
+                .addResourceLocations(
+                        "file:" + backendDir.toString() + "/img/community/",
+                        "file:" + repoRootDir.toString() + "/img/community/"
+                );
 
         // Bingo 및 일반 업로드 파일을 모두 /uploads/** 로 노출
         String bingoUploadDir = backendDir.resolve("img/event/").toUri().toString();
