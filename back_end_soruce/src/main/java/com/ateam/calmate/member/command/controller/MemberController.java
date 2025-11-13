@@ -121,6 +121,20 @@ public class MemberController {
                 .body(responseMessage);
     }
 
+    @PutMapping("/member")
+    public ResponseEntity<ResponseMessage> updateMember(@RequestBody RequestModifyDTO modifiedData) {
+        try{
+              memberService.modifyOfData(modifiedData);
+        } catch (Exception e){
+
+        } finally {
+
+        }
+
+
+
+    }
+
     @PostMapping("/Profile/{id}")
     public ResponseEntity<ResponseMessage> updateProfileImage(
             @RequestParam MultipartFile singleFile,
@@ -249,6 +263,8 @@ public class MemberController {
 
 
     }
+
+
 
 
 

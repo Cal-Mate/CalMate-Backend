@@ -44,6 +44,7 @@ public class MemberServiceImpl implements MemberService {
     private final BaseOfPointRepository baseOfPointRepository;
     private final PointRepository pointRepository;
     private final PasswordEncoder passwordEncoder;  //평문과 암호화 된 다이제스트를 비교하기 위한 도구
+    private final GoalRepository goalRepository;
 
     @Autowired
     public MemberServiceImpl(MemberRepository memberRepository
@@ -58,7 +59,8 @@ public class MemberServiceImpl implements MemberService {
             , PasswordEncoder passwordEncoder
             , MemberAuthorityRepository memberAuthorityRepository
             , BaseOfPointRepository baseOfPointRepository
-            , PointRepository pointRepository) {
+            , PointRepository pointRepository
+    ,GoalRepository goalRepository) {
         this.memberRepository = memberRepository;
         this.memberQueryService = memberQueryService;
         this.modelMapper = modelMapper;
@@ -72,6 +74,7 @@ public class MemberServiceImpl implements MemberService {
         this.memberAuthorityRepository = memberAuthorityRepository;
         this.baseOfPointRepository = baseOfPointRepository;
         this.pointRepository = pointRepository;
+        this.goalRepository = goalRepository;
     }
 
     @Override
@@ -342,6 +345,29 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(member_id).orElse(null);
 
         calculatePoint(member, id);
+    }
+
+    @Override
+    public void modifyOfData(RequestModifyDTO modifiedData) {
+        Member member =  memberRepository.findById(modifiedData.getId()).orElse(null);
+        member.setNickname(modifiedData.getNickname());
+        member.setPhone(modifiedData.getPhone());
+        member.setHeight(modifiedData.getHeight());
+        member.setWeight(modifiedData.getWeight());
+
+        memberRepository.save(member);
+
+
+        MemberGoal memberGoal = goalRepository.findByMemberId(modifiedData.getId());
+
+        if(memberGoal == null)
+            memberGoal = modelMapper.map(modifiedData, MemberGoal.class);
+
+        memberGoal.setGoalType(modifiedData.getGoalType());
+        memberGoal.setEndDate(modifiedData.getEndDate());
+
+
+
     }
 
     // 포인트 연산
