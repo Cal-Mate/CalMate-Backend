@@ -5,6 +5,7 @@ import com.ateam.calmate.diary.command.dto.DiaryUpdateRequest;
 import com.ateam.calmate.diary.command.entity.Diary;
 import com.ateam.calmate.diary.command.entity.DiaryFile;
 import com.ateam.calmate.diary.command.repository.DiaryRepository;
+import com.ateam.calmate.diary.command.repository.DiaryFileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class DiaryCommandService {
 
     private final DiaryRepository diaryRepository;
+    private final DiaryFileRepository diaryFileRepository;
 
     // 실제 파일 저장 디렉토리
     private static final String UPLOAD_DIR = "uploads/diary";
@@ -62,9 +64,14 @@ public class DiaryCommandService {
         if (req.getCondition() != null) diary.setCondition(req.getCondition());
         if (req.getMemo() != null) diary.setMemo(req.getMemo());
 
-        if (files != null) {
-            diary.getFiles().clear();        // 기존 파일 제거 (orphanRemoval)
-            saveFiles(diary, files);         // 새 파일 저장
+        // 선택적으로 파일 삭제
+        if (req.getDeleteFileIds() != null && !req.getDeleteFileIds().isEmpty()) {
+            diaryFileRepository.deleteByIdInAndDiary_Id(req.getDeleteFileIds(), diaryId);
+        }
+
+        // 새 파일 추가
+        if (files != null && !files.isEmpty()) {
+            saveFiles(diary, files);
         }
 
         return diary;
