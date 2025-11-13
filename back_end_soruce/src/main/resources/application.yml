@@ -5,8 +5,8 @@ spring:
     name: member-client
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://cal-mate.iptime.org:15161/cal_mate?&rewriteBatchedStatements=true
-    #    url: jdbc:mariadb://cal-mate-mariadb-ser:3310/cal_mate?&rewriteBatchedStatements=true
+#    url: jdbc:mariadb://cal-mate.iptime.org:15161/cal_mate?&rewriteBatchedStatements=true
+    url: jdbc:mariadb://cal-mate-mariadb-ser:3310/cal_mate?&rewriteBatchedStatements=true
     username: cal_mate
     password: cal123123
     hikari:
@@ -48,7 +48,7 @@ logging:
 token:
   access:
     secret: v7o98gdK42iddFqTxH07Yjv18KbwIZWQZu7NRPeR9+ji9tOGDX2r8PO3mGptklEdEiIB0RMT066q3qb19YBfqQ==
-    expiration_time: 600000 # 10 분
+    expiration_time: 60000 # 10 분
   refresh:
     secret: QUohbgcqwRhk+Xi7zbhgWrkGA0SFRI6OIjzjOsPMtXN5G6RtwBuX0UKENxM07M9WRQBnSuvmU3J4GEpPzqWj/w==
     expiration_time: 86400000 # 1 일 [ms] 단위
