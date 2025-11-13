@@ -7,4 +7,6 @@ import java.io.InputStream;
 
 public interface BingoCommandService {
     CheckCellWithUploadResult checkCellWithUpload(CheckCellWithUploadCommand cmd, InputStream fileStream);
+    boolean deleteUploadedFile(Integer fileId, Long memberId);
+    boolean cancelCellCheck(Integer boardId, Integer cellId, Long memberId);
 }

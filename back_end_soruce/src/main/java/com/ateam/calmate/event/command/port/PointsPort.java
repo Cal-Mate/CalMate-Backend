@@ -2,4 +2,5 @@ package com.ateam.calmate.event.command.port;
 
 public interface PointsPort {
     void addPoints(Long memberId, int amount, String reason);
+    void deductPoints(Long memberId, int amount, String reason);
 }
