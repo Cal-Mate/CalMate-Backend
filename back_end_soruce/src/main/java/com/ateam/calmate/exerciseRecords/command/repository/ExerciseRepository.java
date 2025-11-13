@@ -6,4 +6,5 @@ import java.time.LocalDate;
 
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
     boolean existsByMemberIdAndDate(Long memberId, LocalDate date); // ✅ 추가
+    int countByMemberIdAndDate(Long memberId, LocalDate date);
 }

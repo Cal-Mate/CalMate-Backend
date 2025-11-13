@@ -1,5 +1,7 @@
 package com.ateam.calmate.dietManagement.command.service;
 
+import com.ateam.calmate.calendar.command.entity.CalendarEntity;
+import com.ateam.calmate.calendar.command.repository.CalendarRepository;
 import com.ateam.calmate.dietManagement.command.dto.FoodRequest;
 import com.ateam.calmate.dietManagement.command.dto.MealRequest;
 import com.ateam.calmate.dietManagement.command.entity.*;
@@ -14,6 +16,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,20 +30,19 @@ public class MealCommandServiceImpl implements MealCommandService {
     private final FoodRepository foodRepository;
     private final FoodFileUploadRepository fileUploadRepository;
     private final FoodExtendFilePathRepository extendFilePathRepository;
-    private final MealPointService mealPointService; // ✅ 포인트 서비스
+    private final MealPointService mealPointService;
+    private final CalendarRepository calendarRepository;
 
     private final String uploadRootDir = "img/meal";
 
     @Override
     public Long createMeal(MealRequest request, List<MultipartFile> files) {
-        // ✅ 식사 엔티티 생성
         Meal meal = Meal.builder()
                 .date(request.getDate())
                 .type(request.getType())
                 .memberId(request.getMemberId())
                 .build();
 
-        // ✅ 음식 엔티티 생성 및 저장
         Food food = buildFoodFromRequest(request.getFood());
         foodRepository.save(food);
 
@@ -50,7 +52,6 @@ public class MealCommandServiceImpl implements MealCommandService {
 
         mealRepository.save(meal);
 
-        // ✅ 파일 저장
         if (files != null && !files.isEmpty()) {
             int order = 1;
             for (MultipartFile file : files) {
@@ -59,7 +60,10 @@ public class MealCommandServiceImpl implements MealCommandService {
             }
         }
 
-        // ✅ 작성할 때마다 5포인트 지급
+        // 캘린더 meal_status = 1
+        updateMealStatus(request.getMemberId(), request.getDate(), true);
+
+        // 포인트 지급
         mealPointService.earnMealPoint(request.getMemberId());
 
         return meal.getId();
@@ -70,11 +74,13 @@ public class MealCommandServiceImpl implements MealCommandService {
         Meal meal = mealRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("meal not found"));
 
+        LocalDate oldDate = meal.getDate();
+        Long oldMemberId = meal.getMemberId();
+
         meal.setDate(request.getDate());
         meal.setType(request.getType());
         meal.setMemberId(request.getMemberId());
 
-        // ✅ 음식 업데이트
         meal.getFoods().clear();
         Food food = buildFoodFromRequest(request.getFood());
         foodRepository.save(food);
@@ -84,33 +90,43 @@ public class MealCommandServiceImpl implements MealCommandService {
         boolean hasNewFiles = (files != null && !files.isEmpty());
         boolean touchImages = (keepFileIds != null) || hasNewFiles;
 
-        if (!touchImages) return;
+        if (touchImages) {
+            List<FoodFileUpload> currentFiles = new ArrayList<>(meal.getFiles());
+            for (FoodFileUpload f : currentFiles) {
+                boolean keep = (keepFileIds != null && keepFileIds.contains(f.getId()));
+                if (!keep) {
+                    deletePhysicalFile(f);
+                    meal.getFiles().remove(f);
+                    fileUploadRepository.delete(f);
+                }
+            }
 
-        // ✅ 기존 파일 중에서 유지 안 하는 것 삭제
-        List<FoodFileUpload> currentFiles = new ArrayList<>(meal.getFiles());
-        for (FoodFileUpload f : currentFiles) {
-            boolean keep = (keepFileIds != null && keepFileIds.contains(f.getId()));
-            if (!keep) {
-                deletePhysicalFile(f);
-                meal.getFiles().remove(f);
-                fileUploadRepository.delete(f);
+            if (hasNewFiles) {
+                int order = meal.getFiles().size() + 1;
+                for (MultipartFile file : files) {
+                    if (file.isEmpty()) continue;
+                    saveFile(meal, file, order++);
+                }
             }
         }
 
-        // ✅ 새 파일 저장
-        if (hasNewFiles) {
-            int order = meal.getFiles().size() + 1;
-            for (MultipartFile file : files) {
-                if (file.isEmpty()) continue;
-                saveFile(meal, file, order++);
-            }
+        // 날짜나 회원 변경 시 기존 캘린더 상태 재계산
+        if (!oldDate.equals(request.getDate()) || !oldMemberId.equals(request.getMemberId())) {
+            int oldRemain = mealRepository.countByMemberIdAndDate(oldMemberId, oldDate);
+            updateMealStatus(oldMemberId, oldDate, oldRemain > 0);
         }
+
+        // 새 날짜/회원에 대해 meal_status 갱신
+        updateMealStatus(request.getMemberId(), request.getDate(), true);
     }
 
     @Override
     public void deleteMeal(Long id) {
         Meal meal = mealRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("meal not found"));
+
+        Long memberId = meal.getMemberId();
+        LocalDate date = meal.getDate();
 
         List<FoodFileUpload> oldFiles = new ArrayList<>(meal.getFiles());
         for (FoodFileUpload f : oldFiles) {
@@ -120,6 +136,10 @@ public class MealCommandServiceImpl implements MealCommandService {
         }
 
         mealRepository.delete(meal);
+
+        // 해당 날짜 식단 남은 개수에 따라 meal_status 결정
+        int remain = mealRepository.countByMemberIdAndDate(memberId, date);
+        updateMealStatus(memberId, date, remain > 0);
     }
 
     private Food buildFoodFromRequest(FoodRequest foodReq) {
@@ -158,7 +178,7 @@ public class MealCommandServiceImpl implements MealCommandService {
             file.transferTo(filePath.toFile());
 
             FoodExtendFilePath extendFilePath = FoodExtendFilePath.builder()
-                    .urlPath("/img/meal/")
+                    .urlPath("/img/meal")
                     .build();
             extendFilePathRepository.save(extendFilePath);
 
@@ -189,5 +209,25 @@ public class MealCommandServiceImpl implements MealCommandService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // 캘린더 meal_status 업데이트 (기존 기능 유지 + 최소한 추가)
+    private void updateMealStatus(Long memberId, LocalDate date, boolean hasMeal) {
+        CalendarEntity calendar = calendarRepository
+                .findByMemberIdAndCalDay(memberId, date)
+                .orElseGet(() -> calendarRepository.save(
+                        CalendarEntity.builder()
+                                .memberId(memberId)
+                                .calDay(date)
+                                .exerciseStatus(0)
+                                .mealStatus(0)
+                                .diaryStatus(0)
+                                .badgeYn(0)
+                                .badgeCount(0)
+                                .build()
+                ));
+
+        calendar.setMealStatus(hasMeal ? 1 : 0);
+        calendar.giveDailyBadgeIfPossible();
     }
 }
