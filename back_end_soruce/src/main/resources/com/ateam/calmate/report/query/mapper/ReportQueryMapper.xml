@@ -11,12 +11,10 @@
                 r.yn = #{cond.status}
             </if>
             <if test="cond.typeKeyword != null and cond.typeKeyword != ''">
-                <if test="cond.status != null">AND</if>
-                rb.title LIKE CONCAT('%', #{cond.typeKeyword}, '%')
+                AND rb.title LIKE CONCAT('%', #{cond.typeKeyword}, '%')
             </if>
             <if test="cond.keyword != null and cond.keyword != ''">
-                <if test="cond.status != null or (cond.typeKeyword != null and cond.typeKeyword != '')">AND</if>
-                (
+                AND (
                 r.title LIKE CONCAT('%', #{cond.keyword}, '%')
                 OR reporter.name LIKE CONCAT('%', #{cond.keyword}, '%')
                 OR reported.name LIKE CONCAT('%', #{cond.keyword}, '%')
@@ -28,7 +26,7 @@
     <select id="countReports" parameterType="map" resultType="long">
         SELECT COUNT(1)
         FROM report r
-        LEFT JOIN report_base rb ON rb.id = r.report_base_id
+        LEFT JOIN report_base rb ON rb.id = r.report_id
         LEFT JOIN member reporter ON reporter.id = r.member_id
         LEFT JOIN member reported ON reported.id = r.member_id2
         <include refid="reportWhere"/>
@@ -39,18 +37,23 @@
         SELECT
         r.id,
         r.title,
+        r.contents,
         r.yn,
         r.`date`,
-        r.member_id   AS reporterId,
-        reporter.name AS reporterName,
-        r.member_id2  AS reportedId,
-        reported.name AS reportedName,
-        r.post_id     AS postId,
-        r.comment_id  AS commentId,
-        r.report_image_url AS reportImageUrl,
-        rb.title      AS reportBaseTitle
+        r.member_id        AS reporterId,
+        reporter.name      AS reporterName,
+        r.member_id2       AS reportedId,
+        reported.name      AS reportedName,
+        r.post_id          AS postId,
+        r.comment_id       AS commentId,
+        r.admin_id         AS adminId,
+        r.report_id        AS reportBaseId,
+        rb.title           AS reportBaseTitle,
+        rb.count           AS requiredCount,
+        rb.day_of_ban      AS banDays,
+        r.report_image_url AS reportImageUrl
         FROM report r
-        LEFT JOIN report_base rb ON rb.id = r.report_base_id
+        LEFT JOIN report_base rb ON rb.id = r.report_id
         LEFT JOIN member reporter ON reporter.id = r.member_id
         LEFT JOIN member reported ON reported.id = r.member_id2
         <include refid="reportWhere"/>
@@ -66,21 +69,22 @@
             r.contents,
             r.yn,
             r.`date`,
-            r.member_id         AS reporterId,
-            reporter.name       AS reporterName,
-            r.member_id2        AS reportedId,
-            reported.name       AS reportedName,
-            r.post_id           AS postId,
-            r.comment_id        AS commentId,
-            r.admin_id          AS adminId,
-            r.report_base_id    AS reportBaseId,
-            r.report_base_title AS reportBaseTitle,
-            r.required_count    AS requiredCount,
-            r.ban_days          AS banDays,
-            r.report_image_url  AS reportImageUrl
+            r.member_id        AS reporterId,
+            reporter.name      AS reporterName,
+            r.member_id2       AS reportedId,
+            reported.name      AS reportedName,
+            r.post_id          AS postId,
+            r.comment_id       AS commentId,
+            r.admin_id         AS adminId,
+            r.report_id        AS reportBaseId,
+            rb.title           AS reportBaseTitle,
+            rb.count           AS requiredCount,
+            rb.day_of_ban      AS banDays,
+            r.report_image_url AS reportImageUrl
         FROM report r
                  LEFT JOIN member reporter ON reporter.id = r.member_id
                  LEFT JOIN member reported ON reported.id = r.member_id2
+                 LEFT JOIN report_base rb  ON rb.id = r.report_id
         WHERE r.id = #{id}
     </select>
 
@@ -90,10 +94,10 @@
             f.id,
             f.name,
             f.`type`,
-            f.re_name       AS reName,
+            f.re_name      AS reName,
             f.path,
-            f.thumb_path    AS thumbPath,
-            f.upload_order  AS uploadOrder
+            f.thumb_path   AS thumbPath,
+            f.upload_order AS uploadOrder
         FROM report_fileupload f
         WHERE f.report_id = #{reportId}
         ORDER BY f.upload_order ASC, f.id ASC
