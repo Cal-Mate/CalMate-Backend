@@ -39,7 +39,7 @@ public class ProfileImageService {
         String serverName = req.getServerName(); // localhost
         int port = req.getServerPort();          // 8000
         String requestPath = scheme + "://" + serverName +  ":" + port;
-        String urlImagePath = requestPath + dirPath +  reName;
+        String urlImagePath = dirPath +  reName;
 
         String mimeType = singleFile.getContentType();
         ResponseProfileImageDTO responseProfileImageDTO
