@@ -13,6 +13,7 @@
             m.nickname AS authorName,
             pc.member_id AS memberId,      <!-- ✅ 추가 -->
             pc.content,
+            pc.visibility,
             DATE_FORMAT(pc.create_at, '%Y-%m-%d %H:%i') AS createdAt,
             pc.member_parent_comment_id AS parentId,
 
