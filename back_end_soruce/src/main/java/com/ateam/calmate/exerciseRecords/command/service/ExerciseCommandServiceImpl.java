@@ -1,5 +1,7 @@
 package com.ateam.calmate.exerciseRecords.command.service;
 
+import com.ateam.calmate.calendar.command.entity.CalendarEntity;
+import com.ateam.calmate.calendar.command.repository.CalendarRepository;
 import com.ateam.calmate.exerciseRecords.command.dto.ExerciseRequest;
 import com.ateam.calmate.exerciseRecords.command.entity.Exercise;
 import com.ateam.calmate.exerciseRecords.command.entity.ExerciseExtendFilePath;
@@ -31,7 +33,8 @@ public class ExerciseCommandServiceImpl implements ExerciseCommandService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseFileUploadRepository fileRepository;
     private final ExerciseExtendFilePathRepository extendPathRepository;
-    private final ExercisePointService exercisePointService;   // ✅ 포인트 서비스 주입
+    private final ExercisePointService exercisePointService;
+    private final CalendarRepository calendarRepository;
 
     private final Path exerciseRootDir =
             Paths.get(System.getProperty("user.dir"), "img", "exercise");
@@ -39,14 +42,14 @@ public class ExerciseCommandServiceImpl implements ExerciseCommandService {
     @Override
     public Long createExercise(ExerciseRequest request, List<MultipartFile> files) throws IOException {
 
-        // ✅ 운동 엔티티 저장
         Exercise exercise = exerciseRepository.save(request.toEntity());
 
         if (files != null && !files.isEmpty()) {
             saveFiles(files, exercise);
         }
 
-        // ✅ 작성할 때마다 5포인트 지급
+        updateExerciseStatus(request.getMemberId(), request.getDate(), true);
+
         exercisePointService.earnExercisePoint(request.getMemberId());
 
         return exercise.getId();
@@ -85,12 +88,18 @@ public class ExerciseCommandServiceImpl implements ExerciseCommandService {
         Exercise exercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 운동이 존재하지 않습니다."));
 
+        Long memberId = exercise.getMemberId();
+        LocalDate date = exercise.getDate();
+
         List<ExerciseFileUpload> oldFiles = fileRepository.findByExerciseId(id);
         for (ExerciseFileUpload f : oldFiles) {
             deletePhysicalFile(f);
         }
 
         exerciseRepository.delete(exercise);
+
+        int remainCount = exerciseRepository.countByMemberIdAndDate(memberId, date);
+        updateExerciseStatus(memberId, date, remainCount > 0);
     }
 
     private void saveFiles(List<MultipartFile> files, Exercise exercise) throws IOException {
@@ -142,5 +151,24 @@ public class ExerciseCommandServiceImpl implements ExerciseCommandService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateExerciseStatus(Long memberId, LocalDate date, boolean hasExercise) {
+        CalendarEntity calendar = calendarRepository
+                .findByMemberIdAndCalDay(memberId, date)
+                .orElseGet(() -> calendarRepository.save(
+                        CalendarEntity.builder()
+                                .memberId(memberId)
+                                .calDay(date)
+                                .exerciseStatus(0)
+                                .mealStatus(0)
+                                .diaryStatus(0)
+                                .badgeYn(0)
+                                .badgeCount(0)
+                                .build()
+                ));
+
+        calendar.setExerciseStatus(hasExercise ? 1 : 0);
+        calendar.giveDailyBadgeIfPossible();
     }
 }

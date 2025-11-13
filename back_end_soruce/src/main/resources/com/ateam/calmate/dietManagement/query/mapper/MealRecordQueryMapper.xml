@@ -47,8 +47,11 @@
 
             f.id            AS file_id,
             f.name          AS file_name,
-            CONCAT(COALESCE(p.url_path, ''), f.path, '/', f.re_name) AS file_url,
-            CONCAT(COALESCE(p.url_path, ''), f.thumb_path)          AS thumb_url,
+
+            -- url_path = '/img/meal' 이라고 가정하고, 슬래시 한 번만 붙여서 최종 URL 생성
+            CONCAT(COALESCE(p.url_path, ''), '/', f.re_name) AS file_url,
+            CONCAT(COALESCE(p.url_path, ''), '/', f.re_name) AS thumb_url,
+
             f.upload_order  AS upload_order
         FROM meal m
             LEFT JOIN meal_food mf
