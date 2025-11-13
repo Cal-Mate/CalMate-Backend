@@ -13,6 +13,7 @@
             DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') AS createdAt,
             m.nickname AS authorName,
             p.member_id AS memberId,                <!-- ✅ 게시글 작성자 memberId 추가 -->
+            p.visibility AS visibility,
             t.name AS tagName,
             p.tag_id AS tagId,                <!-- ✅ 여기가 핵심 -->
             (SELECT COUNT(*) FROM post_like pl WHERE pl.post_id = p.id) AS likes,
