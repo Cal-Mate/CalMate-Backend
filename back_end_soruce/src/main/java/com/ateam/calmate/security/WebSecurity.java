@@ -64,48 +64,48 @@ public class WebSecurity {
         http.authorizeHttpRequests(authz ->
                                 authz
                                         .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-//                                        .requestMatchers("/**").permitAll()
-                                        .requestMatchers(HttpMethod.POST, "ai/*").permitAll()
-
-                                        .requestMatchers(HttpMethod.POST ,"member/member").permitAll()
-                                        .requestMatchers("/member/refresh").permitAll()
-                                        .requestMatchers("/member/logout").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/img/**").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
-                                        .requestMatchers("/health").permitAll()
-
-                                        .requestMatchers(HttpMethod.GET, "/community/posts").permitAll()
-                                        .requestMatchers("/api/calendar/**").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/community/post/*").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/community/post/*/comments").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/community/ranking").permitAll()
-
-                                        .requestMatchers(HttpMethod.POST, "/community/post/*/comments").authenticated()
-                                        .requestMatchers(HttpMethod.PATCH, "/community/post/*/comments/*").authenticated()
-                                        .requestMatchers(HttpMethod.DELETE, "/community/post/*/comments/*").authenticated()
-
-                                        .requestMatchers(HttpMethod.POST, "/community/post").authenticated()
-                                        .requestMatchers(HttpMethod.PATCH, "/community/post/*").authenticated()
-                                        .requestMatchers(HttpMethod.DELETE, "/community/post/*").authenticated()
-
-                                        .requestMatchers(HttpMethod.POST, "/community/comment/*/like").authenticated()
-
-                                        // 빙고 이벤트 API (테스트를 위해 임시로 모두 허용)
-                                        .requestMatchers(HttpMethod.GET, "/api/bingo/**").permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/api/bingo/**").permitAll()
-                                        .requestMatchers(HttpMethod.DELETE, "/api/bingo/**").permitAll()
-
-                                        // 가챠 이벤트 API (테스트를 위해 임시로 모두 허용)
-                                        .requestMatchers("/api/gacha/**").permitAll()
-
-                                        // 포인트 API (테스트를 위해 임시로 모두 허용)
-                                        .requestMatchers("/api/event/points/**").permitAll()
-
-                                        // 업로드 파일 접근
-                                        .requestMatchers("/uploads/**").permitAll()
-
-                                        // WebSocket 엔드포인트 허용
-                                        .requestMatchers("/ws-gacha/**").permitAll()
+////                                        .requestMatchers("/**").permitAll()
+//                                        .requestMatchers(HttpMethod.POST, "/ai/**").permitAll()
+//
+//                                        .requestMatchers(HttpMethod.POST ,"member/member").permitAll()
+//                                        .requestMatchers("/member/refresh").permitAll()
+//                                        .requestMatchers("/member/logout").permitAll()
+//                                        .requestMatchers(HttpMethod.GET, "/img/**").permitAll()
+//                                        .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+//                                        .requestMatchers("/health").permitAll()
+//
+//                                        .requestMatchers(HttpMethod.GET, "/community/posts").permitAll()
+//                                        .requestMatchers("/api/calendar/**").permitAll()
+//                                        .requestMatchers(HttpMethod.GET, "/community/post/*").permitAll()
+//                                        .requestMatchers(HttpMethod.GET, "/community/post/*/comments").permitAll()
+//                                        .requestMatchers(HttpMethod.GET, "/community/ranking").permitAll()
+//
+//                                        .requestMatchers(HttpMethod.POST, "/community/post/*/comments").authenticated()
+//                                        .requestMatchers(HttpMethod.PATCH, "/community/post/*/comments/*").authenticated()
+//                                        .requestMatchers(HttpMethod.DELETE, "/community/post/*/comments/*").authenticated()
+//
+//                                        .requestMatchers(HttpMethod.POST, "/community/post").authenticated()
+//                                        .requestMatchers(HttpMethod.PATCH, "/community/post/*").authenticated()
+//                                        .requestMatchers(HttpMethod.DELETE, "/community/post/*").authenticated()
+//
+//                                        .requestMatchers(HttpMethod.POST, "/community/comment/*/like").authenticated()
+//
+//                                        // 빙고 이벤트 API (테스트를 위해 임시로 모두 허용)
+//                                        .requestMatchers(HttpMethod.GET, "/api/bingo/**").permitAll()
+//                                        .requestMatchers(HttpMethod.POST, "/api/bingo/**").permitAll()
+//                                        .requestMatchers(HttpMethod.DELETE, "/api/bingo/**").permitAll()
+//
+//                                        // 가챠 이벤트 API (테스트를 위해 임시로 모두 허용)
+//                                        .requestMatchers("/api/gacha/**").permitAll()
+//
+//                                        // 포인트 API (테스트를 위해 임시로 모두 허용)
+//                                        .requestMatchers("/api/event/points/**").permitAll()
+//
+//                                        // 업로드 파일 접근
+//                                        .requestMatchers("/uploads/**").permitAll()
+//
+//                                        // WebSocket 엔드포인트 허용
+//                                        .requestMatchers("/ws-gacha/**").permitAll()
 
 //                                        .requestMatchers(
 //                                                "/v3/api-docs/**",
