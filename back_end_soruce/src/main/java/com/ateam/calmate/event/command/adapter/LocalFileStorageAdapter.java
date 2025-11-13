@@ -17,7 +17,7 @@ import java.util.UUID;
 @Component
 public class LocalFileStorageAdapter implements FileStoragePort {
 
-    @Value("${file.upload.base-path:back_end_soruce/img/event}")
+    @Value("${file.upload.base-path:img/event}")
     private String basePath;
 
     @Override

@@ -29,7 +29,7 @@ public class MealCommandServiceImpl implements MealCommandService {
     private final FoodExtendFilePathRepository extendFilePathRepository;
     private final MealPointService mealPointService; // ✅ 포인트 서비스
 
-    private final String uploadRootDir = "back_end_soruce/img/meal";
+    private final String uploadRootDir = "img/meal";
 
     @Override
     public Long createMeal(MealRequest request, List<MultipartFile> files) {

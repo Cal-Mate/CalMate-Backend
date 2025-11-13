@@ -35,7 +35,7 @@ spring:
       max-request-size: 200MB      # 업로드 요청당 총 용량(default 10MB)
   web:
     resources:
-      static-locations: file:./back_end_soruce/img/,file:./uploads/     # 정적 리소스 경로 (상대 경로)
+      static-locations: file:./img/,file:./uploads/     # 정적 리소스 경로 (상대 경로)
       cache-period: 3600                                 # 웹 브라우저의 캐싱 시간(초, 1시간)
 
 logging:
@@ -79,6 +79,6 @@ mybatis:
 
 # 프로필 이미지 관련 경로
 profile:
-  dirPath: /back_end_soruce/img/profile/
+  dirPath: /img/profile/
 
 

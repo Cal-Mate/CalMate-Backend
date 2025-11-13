@@ -19,7 +19,7 @@ public class ProfileImageService {
     public ProfileImageService(@Value("${profile.dirPath}") String dirPath) {
 
         this.dirPath = dirPath;
-        uploadDir = System.getProperty("user.dir").replace("\\","/") + dirPath;
+        uploadDir = System.getProperty("user.dir") + dirPath;
     }
 
     public ResponseProfileImageDTO updateProfileImage(MultipartFile singleFile, Long id, HttpServletRequest req) throws IOException {
