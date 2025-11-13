@@ -47,9 +47,8 @@
 
             f.id            AS file_id,
             f.name          AS file_name,
-            -- url_path = '/img/meal/', re_name = 'uuid.png'
-            CONCAT(COALESCE(p.url_path, ''), f.re_name)                  AS file_url,
-            CONCAT(COALESCE(p.url_path, ''), COALESCE(f.thumb_path, '')) AS thumb_url,
+            CONCAT(COALESCE(p.url_path, ''), f.path, '/', f.re_name) AS file_url,
+            CONCAT(COALESCE(p.url_path, ''), f.thumb_path)          AS thumb_url,
             f.upload_order  AS upload_order
         FROM meal m
             LEFT JOIN meal_food mf

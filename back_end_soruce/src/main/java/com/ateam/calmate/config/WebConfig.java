@@ -34,8 +34,13 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/img/community/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/community/");
 
+        // Bingo event uploads (files are stored in back_end_soruce/img/event/)
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/back_end_soruce/img/event/");
+
         registry.addResourceHandler("/img/report/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/img/report/");
+
 
     }
 

@@ -114,4 +114,26 @@ public class CalendarController {
                 "badgeCount", totalBadgeCount
         );
     }
+
+    /**
+     * 🏅 전체(누적) 뱃지 개수 합계 조회
+     * 예시:
+     *  - /api/calendar/badge-count
+     *  - /api/calendar/badge-count?memberId=3
+     */
+    @GetMapping("/badge-total-count")
+    public Map<String, Object> getTotalBadgeCount(
+            @RequestParam(required = false) Long memberId
+    ) {
+        if (memberId == null) {
+            memberId = 1L; // TODO: JWT 후 토큰에서 추출
+        }
+
+        int totalBadgeCount = calendarMapper.selectTotalBadgeCountByMember(memberId);
+
+        return Map.of(
+                "memberId", memberId,
+                "badgeCount", totalBadgeCount
+        );
+    }
 }

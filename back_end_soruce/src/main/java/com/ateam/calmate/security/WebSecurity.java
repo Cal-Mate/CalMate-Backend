@@ -98,6 +98,24 @@ public class WebSecurity {
                                         // 게시글 및 댓글 좋아요
                                         .requestMatchers(HttpMethod.POST, "/community/post/*/like").authenticated()
                                         .requestMatchers(HttpMethod.POST, "/community/comment/*/like").authenticated()
+
+                                        // 빙고 이벤트 API (테스트를 위해 임시로 모두 허용)
+                                        .requestMatchers(HttpMethod.GET, "/api/bingo/**").permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/api/bingo/**").permitAll()
+                                        .requestMatchers(HttpMethod.DELETE, "/api/bingo/**").permitAll()
+
+                                        // 가챠 이벤트 API (테스트를 위해 임시로 모두 허용)
+                                        .requestMatchers("/api/gacha/**").permitAll()
+
+                                        // 포인트 API (테스트를 위해 임시로 모두 허용)
+                                        .requestMatchers("/api/event/points/**").permitAll()
+
+                                        // 업로드 파일 접근
+                                        .requestMatchers("/uploads/**").permitAll()
+
+                                        // WebSocket 엔드포인트 허용
+                                        .requestMatchers("/ws-gacha/**").permitAll()
+
 //                                        .requestMatchers(
 //                                                "/v3/api-docs/**",
 //                                                "/swagger-ui/**",
