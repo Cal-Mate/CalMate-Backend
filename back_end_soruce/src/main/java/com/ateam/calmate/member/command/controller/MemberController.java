@@ -214,6 +214,7 @@ public class MemberController {
 
         } catch (RuntimeException ex) {
             // 재사용 감지/오류 → 전체 세션 강제폐기 + 쿠키 삭제 권장
+            log.error(ex.getMessage());
             // rts.revokeAllForUser(userId) // userId 파악 가능할 때
             ResponseCookie del = cookieUtil.deleteRefreshCookie();
             return ResponseEntity.status(401)
