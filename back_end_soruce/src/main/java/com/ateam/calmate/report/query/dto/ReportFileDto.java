@@ -12,4 +12,6 @@ public class ReportFileDto {
     private String path;
     private String thumbPath;
     private Integer uploadOrder;
+    private String fileUrl;
+    private String thumbUrl;
 }

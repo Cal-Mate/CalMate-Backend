@@ -48,6 +48,7 @@ public class BingoBoardFactoryService {
                     .startDate(start)
                     .endDate(end)
                     .createdAt(java.time.LocalDateTime.now())
+                    .completedLineCount(0)
                     .build();
             var saved = boardRepo.save(board);
 

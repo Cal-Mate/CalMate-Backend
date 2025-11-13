@@ -16,6 +16,7 @@ public class PostListResponseDTO {
     private String title;
     private String content;
     private String createdAt;
+    private Integer visibility;
     private String tagName;
     private String authorName;  // member의 닉네임
     private String imageUrl;    // 이미지 경로

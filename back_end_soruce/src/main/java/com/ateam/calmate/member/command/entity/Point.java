@@ -3,6 +3,8 @@ package com.ateam.calmate.member.command.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "point")
 @Getter
@@ -38,8 +40,8 @@ public class Point {
     @Column(name = "bingo_board_id")
     private Integer bingoBoardId;
 
-    @Column(name = "histoy_time", nullable = false, insertable = false )
-    private Integer histoyTime;
+    @Column(name = "histoy_time", nullable = false, insertable = false, updatable = false)
+    private LocalDateTime historyTime;
 
     // ✅ enum 타입 정의 (DB의 ENUM('EARN','USE') 매핑)
     public enum Distinction {

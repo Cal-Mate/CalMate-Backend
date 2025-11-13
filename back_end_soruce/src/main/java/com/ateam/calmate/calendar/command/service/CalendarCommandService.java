@@ -23,6 +23,7 @@ public class CalendarCommandService {
                 .exerciseStatus(nvl(req.getExerciseStatus()))
                 .mealStatus(nvl(req.getMealStatus()))
                 .diaryStatus(nvl(req.getDiaryStatus()))
+                .badgeCount(0)  // 초기값 0
                 .memberId(req.getMemberId())
                 .build();
 
@@ -73,7 +74,7 @@ public class CalendarCommandService {
     }
 
     /**
-     * 운동/식단/일기 모두 1이면 badge_yn = 1, 아니면 0
+     * 운동/식단/일기 모두 1이면 badge_yn = 1 & badge_count = 1, 아니면 badge_yn = 0 & badge_count = 0
      */
     private void applyBadgeRule(CalendarEntity entity) {
         int ex = nvl(entity.getExerciseStatus());
@@ -81,9 +82,16 @@ public class CalendarCommandService {
         int diary = nvl(entity.getDiaryStatus());
 
         if (ex == 1 && meal == 1 && diary == 1) {
-            entity.setBadgeYn(1);
+            // 세 가지 조건 모두 충족: 뱃지 지급 (하루 최대 1개)
+            if (nvl(entity.getBadgeYn()) == 0) {
+                // 아직 뱃지 안 받은 경우만 지급
+                entity.setBadgeYn(1);
+                entity.setBadgeCount(1);
+            }
         } else {
+            // 조건 미충족: 뱃지 미지급
             entity.setBadgeYn(0);
+            entity.setBadgeCount(0);
         }
     }
 

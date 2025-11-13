@@ -1,26 +1,36 @@
+// dto/ReportListItemDto.java
 package com.ateam.calmate.report.query.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter @Setter
 public class ReportListItemDto {
     private Long id;
     private String title;
-    private String reportBaseTitle;   // 신고 유형명 (욕설/도배 등)
-    private Boolean yn;               // 처리 여부
-    private LocalDateTime date;       // 생성일
+    private String contents;
+    private Boolean yn;
+    private LocalDateTime date;
 
-    private Long reporterId;          // 신고자
+    private Long reporterId;
     private String reporterName;
 
-    private Long reportedId;          // 피신고자
+    private Long reportedId;
     private String reportedName;
 
-    private Long postId;              // 대상이 게시글이면 세팅
-    private Long commentId;           // 대상이 댓글이면 세팅
+    private Long postId;
+    private Long commentId;
 
-    private String reportImageUrl;    // 리스트 썸네일용(스냅샷)
+    private Long adminId;
+    private Long reportBaseId;
+    private String reportBaseTitle;
+    private Integer requiredCount;
+    private Integer banDays;
+
+    private String reportImageUrl;
+
+    // (원하시면) 리스트에서도 첨부 파일까지 함께 보시려면 아래 유지
+    private List<ReportFileDto> files; // 선택
 }
