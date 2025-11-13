@@ -43,7 +43,7 @@ public class AiDietCommandService {
         log.info("sendRequest={}", sendRequest);
 
         // Fast API로 통신
-        String fastApiUrl = "http://localhost:8000/api/v1/diet/recommend";
+        String fastApiUrl = "http://localhost:30080/api/v1/diet/recommend";
         log.info("AI 서버({})에 식단 추천을 요청합니다...", fastApiUrl);
 
         // AI 응답으로 온 Json을 편집
@@ -160,7 +160,7 @@ public class AiDietCommandService {
         log.info("sendExerciseRequest={}", exerciseRequest);
 
         // Fast API로 통신
-        String fastApiUrl = "http://localhost:8000/api/v1/exercise/recommend";
+        String fastApiUrl = "http://localhost:30080/api/v1/exercise/recommend";
         log.info("AI 서버({})에 운동 추천을 요청합니다...", fastApiUrl);
 
         // AI 응답으로 온 Json을 편집
