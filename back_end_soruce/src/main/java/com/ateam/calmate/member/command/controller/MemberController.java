@@ -90,6 +90,7 @@ public class MemberController {
             return ResponseEntity.status(httpStatus)
                     .body(responseMessage);
         } catch (IllegalArgumentException e) {
+            log.info(e.getMessage());
             ResponseMessage responseMessage =
                     new ResponseMessage(HttpStatus.BAD_REQUEST.value(), "필수 입력 정보가 누락 됐습니다.", null);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

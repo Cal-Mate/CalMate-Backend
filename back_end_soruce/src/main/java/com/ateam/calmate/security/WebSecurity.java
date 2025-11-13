@@ -65,7 +65,7 @@ public class WebSecurity {
                                 authz
                                         .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
 //                                        .requestMatchers("/**").permitAll()
-
+                                        .requestMatchers(HttpMethod.POST, "ai/*").authenticated()
 
                                         .requestMatchers(HttpMethod.POST ,"member/member").permitAll()
                                         .requestMatchers("/member/refresh").permitAll()
