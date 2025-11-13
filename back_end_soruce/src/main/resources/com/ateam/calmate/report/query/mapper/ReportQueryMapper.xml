@@ -94,10 +94,11 @@
             f.id,
             f.name,
             f.`type`,
-            f.re_name      AS reName,
+            f.re_name,
             f.path,
-            f.thumb_path   AS thumbPath,
-            f.upload_order AS uploadOrder
+            f.thumb_path,
+            f.upload_order,
+            CONCAT('/img/report/', f.re_name) AS file_url
         FROM report_fileupload f
         WHERE f.report_id = #{reportId}
         ORDER BY f.upload_order ASC, f.id ASC
