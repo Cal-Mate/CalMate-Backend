@@ -44,10 +44,12 @@ DROP TABLE IF EXISTS `gacha_quantity`;
 DROP TABLE IF EXISTS `gacha_prize`;
 DROP TABLE IF EXISTS `gacha_event`;
 DROP TABLE IF EXISTS `gacha_reset`;
+DROP TABLE IF EXISTS `gacha_prize_inventory`;
 
 DROP TABLE IF EXISTS bingo_fileupload;
 DROP TABLE IF EXISTS bingo_cell;
 DROP TABLE IF EXISTS bingo_board;
+DROP TABLE IF EXISTS bingo_line_reward;
 
 DROP TABLE IF EXISTS `point_balance`;
 DROP TABLE IF EXISTS `point_log`;
@@ -229,6 +231,7 @@ CREATE TABLE IF NOT EXISTS post_comment (
     post_id   INT   NOT NULL,
     member_id   BIGINT   NOT NULL,
     member_parent_comment_id   INT   NULL,
+    visibility   TINYINT(1)   NULL   DEFAULT 0,
     PRIMARY KEY (id)
     ) ENGINE=InnoDB;
 
@@ -473,6 +476,8 @@ CREATE TABLE `bingo_board` (
                                `id` INT NOT NULL AUTO_INCREMENT,
                                `title` VARCHAR(255) NOT NULL,
                                `size` INT NOT NULL,
+                               `completed_line_count` INT DEFAULT 0 COMMENT '완성된 빙고 라인 수',
+                               completed BOOLEAN DEFAULT FALSE,
                                `start_date` DATE NOT NULL,
                                `end_date` DATE NULL,
                                `created_at` DATETIME NOT NULL,
@@ -492,6 +497,16 @@ CREATE TABLE `bingo_cell` (
                               CONSTRAINT ck_bingo_cell_is_checked CHECK (`is_checked` IN (0,1)),
                               CONSTRAINT pk_bingo_cell_id PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE bingo_line_reward (
+                                   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                   board_id BIGINT NOT NULL,
+                                   line_type ENUM('ROW','COL','DIAG1','DIAG2') NOT NULL,
+                                   line_index INT NULL,
+                                   rewarded_at DATETIME,
+                                   UNIQUE KEY uk_board_line (board_id, line_type, line_index),
+                                   INDEX idx_board_id (board_id)
+);
 
 
 /* BINGO_FILEUPLOAD */
@@ -603,6 +618,18 @@ CREATE TABLE `gacha_reward_grant` (
                                       PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='경품 지급 처리 로그';
 
+/* gacha_prize_inventory */
+CREATE TABLE `gacha_prize_inventory` (
+                                         `id`         BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                         `event_id`   BIGINT       NOT NULL,
+                                         `prize_tier` VARCHAR(50)  NOT NULL,
+                                         `status`     ENUM('READY','USED') NOT NULL DEFAULT 'READY',
+                                         `used_by`    BIGINT       NULL,
+                                         `used_at`    DATETIME     NULL,
+                                         `created_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci COMMENT='경품 인벤토리(READY→USED 관리)';
+
 /* POINT_LOG: 포인트 적립/사용/만료/조정 기록 (불변 로그) */
 CREATE TABLE `point_log` (
                              `point_log_id`    BIGINT NOT NULL AUTO_INCREMENT COMMENT '포인트 로그 PK',
@@ -672,7 +699,7 @@ CREATE TABLE `point` (
 
 -- ----- 제약조건 ----------
 -- ✅ 외래키 검사 다시 활성화
-SET FOREIGN_KEY_CHECKS = 1;
+# SET FOREIGN_KEY_CHECKS = 1;
 
 ALTER TABLE post add CONSTRAINT fk_post_member FOREIGN KEY (member_id) REFERENCES member(id);
 ALTER TABLE post add CONSTRAINT fk_post_tag FOREIGN KEY (tag_id) REFERENCES tag(id);
@@ -851,6 +878,17 @@ ALTER TABLE `gacha_reward_grant`
         FOREIGN KEY (`gacha_shared_board_id`) REFERENCES `gacha_shared_board`(`id`)
             ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE `gacha_prize_inventory`
+    ADD CONSTRAINT `fk_inventory_event`
+        FOREIGN KEY (`event_id`) REFERENCES `gacha_event`(`id`)
+            ON UPDATE CASCADE ON DELETE CASCADE,
+    ADD CONSTRAINT `fk_inventory_member`
+        FOREIGN KEY (`used_by`) REFERENCES `member`(`id`)
+            ON UPDATE CASCADE ON DELETE SET NULL;
+
+CREATE INDEX `idx_inventory_event_status`
+    ON `gacha_prize_inventory` (`event_id`, `status`);
+
 /* 멤버 FK: 로그는 역사이므로 멤버 삭제를 쉽게 막기 위해 RESTRICT 권장 */
 ALTER TABLE `point_log`
     ADD CONSTRAINT `fk_point_log_member`
@@ -873,17 +911,3 @@ CREATE INDEX `idx_point_log_source`
 ALTER TABLE `point_log`
     ADD CONSTRAINT `ck_point_log_delta_nonzero`
         CHECK (`delta` <> 0);
-
-
-/* ========== POINT_BALANCE 제약 & 인덱스 ========== */
-
-/* 멤버 FK: 스냅샷은 멤버와 생명주기를 같이 가도록 CASCADE 권장 */
-ALTER TABLE `point_balance`
-    ADD CONSTRAINT `fk_point_balance_member`
-        FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
-            ON DELETE CASCADE ON UPDATE CASCADE;
-
-/* (선택) 잔액 음수 방지 */
-ALTER TABLE `point_balance`
-    ADD CONSTRAINT `ck_point_balance_nonnegative`
-        CHECK (`balance` >= 0);

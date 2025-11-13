@@ -44,12 +44,12 @@ INSERT INTO member (
 VALUES
     ('세종대왕', '훈민정음', 'sejong@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-1111-1111', 'M', '1397-05-15', 175.00, 70.50, 1, 95, NOW(), 0, NULL, NULL, 1, 1),
     ('이순신', '충무공', 'leesoonshin@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-2222-2222', 'M', '1545-04-28', 178.20, 75.30, 1, 92, NOW(), 0, NULL, NULL, 1, 1),
-    ('신사임당', '사임당', 'shinsaimdang@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-3333-3333', 'F', '1504-10-29', 160.40, 55.20, 1, 88, NOW(), 0, NULL, NULL, 1, 1),
-    ('장영실', '과학자', 'jangyoungsil@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-4444-4444', 'M', '1390-03-20', 170.80, 68.10, 1, 83, NOW(), 0, NULL, NULL, 1, 1),
+    ('신사임당', '사임당', 'shinsaimdang@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-3333-3333', 'F', '1504-10-29', 160.40, 55.20, 1, 100000000, NOW(), 0, NULL, NULL, 1, 1),
+    ('장영실', '과학자', 'jangyoungsil@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-4444-4444', 'M', '1390-03-20', 170.80, 68.10, 1, 10000000, NOW(), 0, NULL, NULL, 1, 1),
     ('김유신', '삼국통일', 'kimyushin@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-5555-5555', 'M', '595-10-01', 176.50, 72.00, 1, 90, NOW(), 0, NULL, NULL, 1, 1),
     ('유관순', '만세소녀', 'yugwansoon@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-6666-6666', 'F', '1902-12-16', 158.00, 50.30, 1, 85, NOW(), 0, NULL, NULL, 1, 1),
     ('정약용', '목민심서', 'jeongyakyong@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-7777-7777', 'M', '1762-08-05', 172.00, 68.50, 1, 80, NOW(), 0, NULL, NULL, 1, 1),
-    ('윤봉길', '의사', 'yunbonggil@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-8888-8888', 'M', '1908-06-21', 174.50, 69.20, 1, 87, NOW(), 0, NULL, NULL, 1, 1),
+    ('윤봉길', '의사1', 'yunbonggil@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-8888-8888', 'M', '1908-06-21', 174.50, 69.20, 1, 87, NOW(), 0, NULL, NULL, 1, 1),
     ('안중근', '의사', 'ahnjoonggeun@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-9999-9999', 'M', '1879-09-02', 175.20, 71.80, 1, 93, NOW(), 0, NULL, NULL, 1, 1),
     ('허준', '동의보감', 'heojun@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-1010-1010', 'M', '1539-03-05', 168.00, 65.00, 1, 76, NOW(), 0, NULL, NULL, 1, 1),
     ('이황', '퇴계', 'toegye@gmail.com', '$2a$10$84PEAn90F4ZAVBfSr9HmY.5afk7ymvgZZf3dZs2A9djCTVq16vbm.', '010-1111-1212', 'M', '1501-11-25', 172.50, 66.80, 1, 70, NOW(), 0, NULL, NULL, 1, 1),
@@ -74,7 +74,17 @@ INSERT INTO post (title, content, member_id, tag_id) VALUES
                                                          ('저녁 식단 공유', '고구마+계란+샐러드', 2, 2),
                                                          ('다이어트 실패함..', '다시 처음부터 간다', 3, 3),
                                                          ('오늘 헬스장 사람 미쳤음', '기다리다가 운동 못함', 4, 1),
-                                                         ('잡담) 날씨 너무 좋음', '뛰기 딱 좋다', 5, 4);
+                                                         ('잡담) 날씨 너무 좋음', '뛰기 딱 좋다', 5, 4),
+                                                         ('오늘 벤치 새로운 PR 성공', '다들 가슴운동 뭐함?', 6, 1),
+                                                         ('다이어트 식단 레시피 공유', '두부 스테이크 레시피 알려드림', 7, 2),
+                                                         ('Before 사진 공개합니다', '많이 부끄럽지만...', 8, 3),
+                                                         ('잡담) 오늘 회사 개힘듦', '퇴사각...', 9, 4),
+                                                         ('등운동 루틴 추천좀', '풀데이 하고 싶은데 조언 부탁', 10, 1),
+                                                         ('점심엔 뭐 먹지?', '다이어트 중인데 메뉴 고민됨', 11, 2),
+                                                         ('체지방 3% 감량 성공!', '드디어 이루었다..', 12, 3),
+                                                         ('이 앱 너무 좋다', '커뮤니티 분위기 최고임', 13, 4),
+                                                         ('런닝화 추천해주세요', '발아프지 않은 걸로...', 14, 1),
+                                                         ('슬럼프 극복하는 법', '다들 어떻게 유지함?', 15, 4);
 
 -- 수정해야 할수도 있음
 INSERT INTO post_tag (name, post_id) VALUES
@@ -99,7 +109,18 @@ INSERT INTO post_like (post_id, member_id) VALUES
                                                (6, 5),
                                                (7, 4),
                                                (8, 1),
-                                               (9, 2);
+                                               (9, 2),
+                                               (11, 3),
+                                               (11, 4),
+                                               (12, 5),
+                                               (13, 6),
+                                               (14, 7),
+                                               (15, 8),
+                                               (16, 9),
+                                               (17, 10),
+                                               (18, 11),
+                                               (19, 12),
+                                               (20, 13);
 
 
 -- 일반 댓글 (1~6)
@@ -109,15 +130,38 @@ INSERT INTO post_comment (content, post_id, member_id) VALUES
                                                            ('대단합니다...', 3, 1),       -- 3
                                                            ('사진 공유좀요!', 4, 2),     -- 4
                                                            ('식단 너무 공감...', 5, 3),   -- 5
-                                                           ('화이팅 해요!', 6, 4);       -- 6
+                                                           ('화이팅 해요!', 6, 4),       -- 6
+                                                           ('PR 축하드립니다!', 11, 8),      -- 11
+                                                           ('와 레시피 감사해요', 12, 9),     -- 12
+                                                           ('용기내신 거 멋져요!', 13, 10),   -- 13
+                                                           ('저도 오늘 퇴사각임...', 14, 11), -- 14
+                                                           ('등 루틴 공유드려요', 15, 12),    -- 15
+                                                           ('닭가슴살 어떠세요?', 16, 13),   -- 16
+                                                           ('대박이네요 ㄷㄷ', 17, 14),       -- 17
+                                                           ('맞아요 분위기 좋아요', 18, 15),  -- 18
+                                                           ('저도 추천 궁금해요', 19, 16),    -- 19
+                                                           ('화이팅입니다!', 20, 17),          -- 20
+                                                           ('대단하십니다....!', 13, 3),          -- 21
+                                                           ('턱걸이 좋아욧~', 15, 7),          -- 22
+                                                           ('와 말도 안돼~', 17, 9);          -- 22
+
+
 
 -- 대댓글 (7~10)
 INSERT INTO post_comment (content, post_id, member_id, member_parent_comment_id) VALUES
-                                                                                     ('감사합니다 🙏', 1, 1, 1),   -- 7
-                                                                                     ('저도 해볼게요!', 2, 2, 2), -- 8
-                                                                                     ('저도 같은 상황입니다', 3, 5, 3), -- 9
-                                                                                     ('같이 힘냅시다 💪', 6, 3, 6); -- 10
-
+                                                                                     ('감사합니다 🙏', 1, 1, 1),          -- 7
+                                                                                     ('저도 해볼게요!', 2, 2, 2),        -- 8
+                                                                                     ('저도 같은 상황입니다', 3, 5, 3),  -- 9
+                                                                                     ('같이 힘냅시다 💪', 6, 3, 6),      -- 10
+                                                                                     ('감사합니다 😀', 11, 6, 7),       -- 21
+                                                                                     ('꼭 해드셔보세요!', 12, 7, 8),   -- 22
+                                                                                     ('감사합니다!', 13, 8, 9),         -- 23
+                                                                                     ('진짜요 ㅠㅠ', 14, 9, 10),         -- 24
+                                                                                     ('오 괜찮겠네요', 16, 11, 12),     -- 26
+                                                                                     ('ㅎㅎ 이정도면 거뜬해요!', 17, 12, 13),     -- 27
+                                                                                     ('저도 동의합니다', 18, 13, 14),   -- 28
+                                                                                     ('추천 해주세용 ㅠㅠ', 19, 14, 15),   -- 29
+                                                                                     ('힘낼게요 감사합니다!', 20, 1, 16);           -- 30
 
 INSERT INTO comment_like (post_comment_id, member_id) VALUES
                                                           (1, 2),
@@ -129,8 +173,27 @@ INSERT INTO comment_like (post_comment_id, member_id) VALUES
                                                           (6, 2),
                                                           (7, 5),
                                                           (8, 4),
-                                                          (9, 3);
-
+                                                          (9, 3),
+                                                          (11, 3),
+                                                          (12, 4),
+                                                          (13, 5),
+                                                          (14, 6),
+                                                          (15, 7),
+                                                          (16, 8),
+                                                          (17, 9),
+                                                          (18, 10),
+                                                          (19, 11),
+                                                          (20, 12),
+                                                          (21, 13),
+                                                          (22, 14),
+                                                          (23, 15),
+                                                          (24, 16),
+                                                          (25, 17),
+                                                          (26, 18),
+                                                          (27, 19),
+                                                          (28, 20),
+                                                          (29, 1),
+                                                          (30, 2);
 
 INSERT INTO extend_file_path (url_path) VALUES
                                             ('http://localhost:8081/uploads/'),
@@ -174,7 +237,17 @@ VALUES
     ('post7.jpg', '/img/community/post7.jpg', 'image/jpeg', '/upload/post7.jpg', 'ACTIVE', 'p7.jpg', 7,7),
     ('post8.jpg', '/img/community/post8.jpg', 'image/jpeg', '/upload/post8.jpg', 'ACTIVE', 'p8.jpg', 8,8),
     ('post9.jpg', '/img/community/post9.jpg', 'image/jpeg', '/upload/post9.jpg', 'ACTIVE', 'p9.jpg', 9,9),
-    ('post10.jpg', '/img/community/post10.jpg', 'image/jpeg', '/upload/post10.jpg', 'ACTIVE', 'p10.jpg', 10,10);
+    ('post10.jpg', '/img/community/post10.jpg', 'image/jpeg', '/upload/post10.jpg', 'ACTIVE', 'p10.jpg', 10,10),
+    ('post11.jpg', '/img/community/post11.jpg', 'image/jpeg', '/upload/post11.jpg', 'ACTIVE', 'p11.jpg', 11, 11),
+    ('post12.jpg', '/img/community/post12.jpg', 'image/jpeg', '/upload/post12.jpg', 'ACTIVE', 'p12.jpg', 12, 12),
+    ('post13.jpg', '/img/community/post13.jpg', 'image/jpeg', '/upload/post13.jpg', 'ACTIVE', 'p13.jpg', 13, 13),
+    ('post14.jpg', '/img/community/post14.jpg', 'image/jpeg', '/upload/post14.jpg', 'ACTIVE', 'p14.jpg', 14, 14),
+    ('post15.jpg', '/img/community/post15.jpg', 'image/jpeg', '/upload/post15.jpg', 'ACTIVE', 'p15.jpg', 15, 15),
+    ('post16.jpg', '/img/community/post16.jpg', 'image/jpeg', '/upload/post16.jpg', 'ACTIVE', 'p16.jpg', 16, 16),
+    ('post17.jpg', '/img/community/post17.jpg', 'image/jpeg', '/upload/post17.jpg', 'ACTIVE', 'p17.jpg', 17, 17),
+    ('post18.jpg', '/img/community/post18.jpg', 'image/jpeg', '/upload/post18.jpg', 'ACTIVE', 'p18.jpg', 18, 18),
+    ('post19.jpg', '/img/community/post19.jpg', 'image/jpeg', '/upload/post19.jpg', 'ACTIVE', 'p19.jpg', 19, 19),
+    ('post20.jpg', '/img/community/post20.jpg', 'image/jpeg', '/upload/post20.jpg', 'ACTIVE', 'p20.jpg', 20, 20);
 
 
 INSERT INTO upload_file (
@@ -529,32 +602,49 @@ INSERT INTO `qna` (`title`, `contents`, `created_at`, `member_id`) VALUES
 
 
 INSERT INTO `qna_comment` (`comment`, `created_at`, `qna_id`, `member_id`, `parent_comment_id`) VALUES
-                                                                                                    ('좋은 질문이에요! 저도 궁금했어요.', '2025-11-01 11:00:00', 1, 2, NULL),
-                                                                                                    ('단백질은 체중×1.6g 정도 추천드려요.', '2025-11-02 10:00:00', 2, 3, NULL),
-                                                                                                    ('저는 아침을 꼭 챙겨먹어요!', '2025-11-05 08:00:00', 5, 4, NULL),
-                                                                                                    ('운동 후 스트레칭 꼭 하세요.', '2025-11-06 12:00:00', 6, 5, NULL),
-                                                                                                    ('체중계 브랜드마다 조금 달라요.', '2025-11-08 15:30:00', 8, 1, NULL),
-                                                                                                    ('정체기면 식단을 바꿔보세요.', '2025-11-03 09:00:00', 3, 2, NULL),
-                                                                                                    ('좋은 헬스장 많아요! PM헬스 추천', '2025-11-04 13:00:00', 4, 3, NULL),
-                                                                                                    ('저도 같은 고민이에요 ㅠㅠ', '2025-11-09 10:00:00', 9, 4, NULL),
-                                                                                                    ('잠 부족하면 코르티솔 올라갑니다.', '2025-11-10 23:45:00', 10, 5, NULL),
-                                                                                                    ('위 댓글에 동의합니다!', '2025-11-02 10:30:00', 2, 6, 2);
+-- 1. 운동 루틴 추천
+('안녕하세요, 관리자입니다. 체지방 감량을 원하신다면 주 4~5회 전신 근력운동과 30분 유산소를 병행하세요.', '2025-11-01 12:00:00', 1, 2, NULL),
 
+-- 2. 단백질 섭취량
+('관리자입니다. 운동 강도에 따라 1.2~2.0g까지 조절하시면 됩니다. 물도 충분히 섭취하세요!', '2025-11-02 10:15:00', 2, 2, NULL),
+
+-- 3. 다이어트 정체기
+('관리자입니다. 체중 변화가 없을 땐 섭취 칼로리를 5~10% 줄이거나 활동량을 늘려보세요.', '2025-11-03 09:20:00', 3, 2, NULL),
+
+-- 4. 헬스장 추천
+('관리자입니다. 강남 지역이라면 "바디핏짐"이나 "스마트짐"도 평이 좋습니다.', '2025-11-04 13:20:00', 4, 2, NULL),
+
+-- 5. 아침 식사 중요성
+('관리자입니다. 아침 식사는 대사 활성화와 혈당 안정에 도움을 줍니다. 단, 개인의 식습관에 맞게 조절하세요.', '2025-11-05 08:30:00', 5, 2, NULL),
+
+-- 6. 근육통 완화
+('관리자입니다. 충분한 휴식과 단백질 섭취, 가벼운 유산소가 근육통 완화에 좋습니다.', '2025-11-06 12:20:00', 6, 2, NULL),
+
+-- 7. 유산소 시간
+('관리자입니다. 건강 목적이라면 30분 이상, 체지방 감량 목적이라면 45~60분이 좋습니다.', '2025-11-07 15:00:00', 7, 2, NULL),
+
+-- 8. 체중계 정확도
+('관리자입니다. 바닥이 평평하지 않거나 시간대가 다르면 오차가 큽니다. 매일 같은 시간, 같은 위치에서 측정하세요.', '2025-11-08 16:00:00', 8, 2, NULL),
+
+-- 9. 식단 관리 앱 추천
+('관리자입니다. "마이핏니스팔", "누적칼로리", "다신" 같은 앱을 추천드립니다.', '2025-11-09 10:15:00', 9, 2, NULL),
+
+-- 10. 수면과 다이어트
+('관리자입니다. 맞습니다. 수면 부족은 스트레스 호르몬을 증가시켜 지방 연소를 방해합니다.', '2025-11-11 00:00:00', 10, 2, NULL);
 
 INSERT INTO `calendar`
 (`cal_day`, `badge_count`, `exercise_status`, `meal_status`, `diary_status`, `badge_yn`, `member_id`)
 VALUES
-    ('2025-11-01', 1, 1, 1, 1, 1, 1),
-    ('2025-11-02', 0, 1, 0, 1, 0, 1),
-    ('2025-11-03', 1, 1, 1, 1, 1, 1),
-    ('2025-11-04', 0, 0, 1, 1, 0, 1),
-    ('2025-11-05', 1, 1, 1, 1, 1, 2),
-    ('2025-11-06', 0, 1, 1, 0, 0, 2),
-    ('2025-11-07', 1, 1, 1, 1, 1, 2),
-    ('2025-11-08', 1, 1, 1, 1, 1, 3),
-    ('2025-11-09', 0, 1, 0, 0, 0, 3),
-    ('2025-11-10', 1, 1, 1, 1, 1, 3);
-
+    ('2025-11-01', 1, 1, 1, 1, 1, 4),
+    ('2025-11-02', 0, 0, 1, 0, 1, 4),
+    ('2025-11-03', 1, 1, 1, 1, 1, 4),
+    ('2025-11-04', 0, 0, 0, 1, 1, 4),
+    ('2025-11-05', 1, 1, 1, 1, 1, 4),
+    ('2025-11-06', 0, 0, 1, 1, 0, 4),
+    ('2025-11-07', 1, 1, 1, 1, 1, 4),
+    ('2025-11-08', 1, 1, 1, 1, 1, 4),
+    ('2025-11-09', 0, 0, 1, 0, 0, 4),
+    ('2025-11-10', 1, 1, 1, 1, 1, 4);
 
 /* 6) 빙고 보드 */
 INSERT INTO bingo_board (id, title, size, start_date, end_date, created_at, member_id) VALUES
@@ -594,137 +684,245 @@ VALUES
 
 INSERT INTO gacha_prize (name, payload_json, prize_type, rank, gacha_event_id)
 VALUES
-    ('다이아몬드 상자', JSON_OBJECT('item_code', 'ITEM_DIAMOND_BOX', 'value', 1), 'ITEM', 1, 1),
-    ('골드 쿠폰', JSON_OBJECT('coupon_code', 'GOLD2025', 'discount', '20%'), 'COUPON', 2, 1),
-    ('1000 포인트', JSON_OBJECT('point', 1000), 'POINT', 3, 1),
-    ('100 포인트', JSON_OBJECT('point', 100), 'POINT', 4, 1),
-    ('꽝', JSON_OBJECT('message', '다음 기회에!'), 'NOTHING', 5, 1);
+    ('츄잉껌', '{"item_code": "ITEM_CHEWINGGUM", "value": 1}', 'ITEM', 1, 1),
+    ('츄파춥스', '{"item_code": "ITEM_CHUPACHUPS", "value": 1}', 'ITEM', 2, 1),
+    ('100 포인트', '{"point": 100}', 'POINT', 3, 1),
+    ('꽝', '{"message": "다음 기회에!"}', 'NOTHING', 4, 1);
 
-INSERT INTO gacha_quantity (id, count)
-VALUES
-    (1, 1),   -- 다이아몬드 상자
-    (2, 2),  -- 골드 쿠폰
-    (3, 15), -- 1000 포인트
-    (4, 32), -- 100 포인트
-    (5, 50); -- 꽝
+insert into gacha_quantity (id, count)
+values
+    (1, 1),
+    (2, 4),
+    (3, 15),
+    (4, 80);
 
 INSERT INTO gacha_board_seed (gacha_event_id, gacha_prize_id, count_per_board)
 VALUES
     (1, 1, 1),
     (1, 2, 4),
-    (1, 3, 10),
-    (1, 4, 25),
-    (1, 5, 60);
+    (1, 3, 15),
+    (1, 4, 80);
 
-INSERT INTO gacha_shared_board
-(gacha_event_id, board_version, `row`, `col`, gacha_prize_id, status)
+INSERT INTO `calmate`.`gacha_prize_inventory`
+(`id`, `event_id`, `prize_tier`, `status`, `used_by`, `used_at`, `created_at`)
 VALUES
-    (1, 1, 1, 1, 5, 'COVERED'),
-    (1, 1, 1, 2, 5, 'COVERED'),
-    (1, 1, 1, 3, 4, 'COVERED'),
-    (1, 1, 1, 4, 4, 'COVERED'),
-    (1, 1, 1, 5, 3, 'COVERED'),
-    (1, 1, 1, 6, 5, 'COVERED'),
-    (1, 1, 1, 7, 5, 'COVERED'),
-    (1, 1, 1, 8, 2, 'COVERED'),
-    (1, 1, 1, 9, 5, 'COVERED'),
-    (1, 1, 1, 10, 1, 'COVERED'),
-    (1, 1, 2, 1, 5, 'COVERED'),
-    (1, 1, 2, 2, 5, 'COVERED'),
-    (1, 1, 2, 3, 4, 'COVERED'),
-    (1, 1, 2, 4, 4, 'COVERED'),
-    (1, 1, 2, 5, 3, 'COVERED'),
-    (1, 1, 2, 6, 5, 'COVERED'),
-    (1, 1, 2, 7, 5, 'COVERED'),
-    (1, 1, 2, 8, 2, 'COVERED'),
-    (1, 1, 2, 9, 5, 'COVERED'),
-    (1, 1, 2, 10, 1, 'COVERED'),
-    (1, 1, 3, 1, 5, 'COVERED'),
-    (1, 1, 3, 2, 5, 'COVERED'),
-    (1, 1, 3, 3, 4, 'COVERED'),
-    (1, 1, 3, 4, 4, 'COVERED'),
-    (1, 1, 3, 5, 3, 'COVERED'),
-    (1, 1, 3, 6, 5, 'COVERED'),
-    (1, 1, 3, 7, 5, 'COVERED'),
-    (1, 1, 3, 8, 2, 'COVERED'),
-    (1, 1, 3, 9, 5, 'COVERED'),
-    (1, 1, 3, 10, 1, 'COVERED'),
-    (1, 1, 4, 1, 5, 'COVERED'),
-    (1, 1, 4, 2, 5, 'COVERED'),
-    (1, 1, 4, 3, 4, 'COVERED'),
-    (1, 1, 4, 4, 4, 'COVERED'),
-    (1, 1, 4, 5, 3, 'COVERED'),
-    (1, 1, 4, 6, 5, 'COVERED'),
-    (1, 1, 4, 7, 5, 'COVERED'),
-    (1, 1, 4, 8, 2, 'COVERED'),
-    (1, 1, 4, 9, 5, 'COVERED'),
-    (1, 1, 4, 10, 1, 'COVERED'),
-    (1, 1, 5, 1, 5, 'COVERED'),
-    (1, 1, 5, 2, 5, 'COVERED'),
-    (1, 1, 5, 3, 4, 'COVERED'),
-    (1, 1, 5, 4, 4, 'COVERED'),
-    (1, 1, 5, 5, 3, 'COVERED'),
-    (1, 1, 5, 6, 5, 'COVERED'),
-    (1, 1, 5, 7, 5, 'COVERED'),
-    (1, 1, 5, 8, 2, 'COVERED'),
-    (1, 1, 5, 9, 5, 'COVERED'),
-    (1, 1, 5, 10, 1, 'COVERED'),
-    (1, 1, 6, 1, 5, 'COVERED'),
-    (1, 1, 6, 2, 5, 'COVERED'),
-    (1, 1, 6, 3, 4, 'COVERED'),
-    (1, 1, 6, 4, 4, 'COVERED'),
-    (1, 1, 6, 5, 3, 'COVERED'),
-    (1, 1, 6, 6, 5, 'COVERED'),
-    (1, 1, 6, 7, 5, 'COVERED'),
-    (1, 1, 6, 8, 2, 'COVERED'),
-    (1, 1, 6, 9, 5, 'COVERED'),
-    (1, 1, 6, 10, 1, 'COVERED'),
-    (1, 1, 7, 1, 5, 'COVERED'),
-    (1, 1, 7, 2, 5, 'COVERED'),
-    (1, 1, 7, 3, 4, 'COVERED'),
-    (1, 1, 7, 4, 4, 'COVERED'),
-    (1, 1, 7, 5, 3, 'COVERED'),
-    (1, 1, 7, 6, 5, 'COVERED'),
-    (1, 1, 7, 7, 5, 'COVERED'),
-    (1, 1, 7, 8, 2, 'COVERED'),
-    (1, 1, 7, 9, 5, 'COVERED'),
-    (1, 1, 7, 10, 1, 'COVERED'),
-    (1, 1, 8, 1, 5, 'COVERED'),
-    (1, 1, 8, 2, 5, 'COVERED'),
-    (1, 1, 8, 3, 4, 'COVERED'),
-    (1, 1, 8, 4, 4, 'COVERED'),
-    (1, 1, 8, 5, 3, 'COVERED'),
-    (1, 1, 8, 6, 5, 'COVERED'),
-    (1, 1, 8, 7, 5, 'COVERED'),
-    (1, 1, 8, 8, 2, 'COVERED'),
-    (1, 1, 8, 9, 5, 'COVERED'),
-    (1, 1, 8, 10, 1, 'COVERED'),
-    (1, 1, 9, 1, 5, 'COVERED'),
-    (1, 1, 9, 2, 5, 'COVERED'),
-    (1, 1, 9, 3, 4, 'COVERED'),
-    (1, 1, 9, 4, 4, 'COVERED'),
-    (1, 1, 9, 5, 3, 'COVERED'),
-    (1, 1, 9, 6, 5, 'COVERED'),
-    (1, 1, 9, 7, 5, 'COVERED'),
-    (1, 1, 9, 8, 2, 'COVERED'),
-    (1, 1, 9, 9, 5, 'COVERED'),
-    (1, 1, 9, 10, 1, 'COVERED'),
-    (1, 1, 10, 1, 5, 'COVERED'),
-    (1, 1, 10, 2, 5, 'COVERED'),
-    (1, 1, 10, 3, 4, 'COVERED'),
-    (1, 1, 10, 4, 4, 'COVERED'),
-    (1, 1, 10, 5, 3, 'COVERED'),
-    (1, 1, 10, 6, 5, 'COVERED'),
-    (1, 1, 10, 7, 5, 'COVERED'),
-    (1, 1, 10, 8, 2, 'COVERED'),
-    (1, 1, 10, 9, 5, 'COVERED'),
-    (1, 1, 10, 10, 1, 'COVERED');
+    -- ★ Legendary (1개)
+    (1, 1, 'legendary', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+
+    -- ★ Epic (4개)
+    (2, 1, 'epic', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (3, 1, 'epic', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (4, 1, 'epic', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (5, 1, 'epic', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+
+    -- ★ Rare (15개)
+    (6, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (7, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (8, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (9, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (10, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (11, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (12, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (13, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (14, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (15, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (16, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (17, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (18, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (19, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (20, 1, 'rare', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+
+    -- ★ Common (80개)
+    (21, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (22, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (23, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (24, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (25, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (26, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (27, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (28, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (29, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (30, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (31, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (32, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (33, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (34, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (35, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (36, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (37, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (38, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (39, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (40, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (41, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (42, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (43, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (44, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (45, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (46, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (47, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (48, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (49, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (50, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (51, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (52, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (53, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (54, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (55, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (56, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (57, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (58, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (59, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (60, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (61, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (62, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (63, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (64, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (65, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (66, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (67, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (68, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (69, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (70, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (71, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (72, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (73, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (74, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (75, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (76, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (77, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (78, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (79, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (80, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (81, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (82, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (83, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (84, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (85, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (86, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (87, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (88, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (89, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (90, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (91, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (92, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (93, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (94, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (95, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (96, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (97, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (98, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (99, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02'),
+    (100, 1, 'common', 'READY', NULL, NULL, '2025-11-12 18:15:02');
+
+# INSERT INTO gacha_shared_board
+# (gacha_event_id, board_version, `row`, `col`, gacha_prize_id, status)
+# VALUES
+#     (1, 1, 1, 1, 5, 'COVERED'),
+#     (1, 1, 1, 2, 5, 'COVERED'),
+#     (1, 1, 1, 3, 4, 'COVERED'),
+#     (1, 1, 1, 4, 4, 'COVERED'),
+#     (1, 1, 1, 5, 3, 'COVERED'),
+#     (1, 1, 1, 6, 5, 'COVERED'),
+#     (1, 1, 1, 7, 5, 'COVERED'),
+#     (1, 1, 1, 8, 2, 'COVERED'),
+#     (1, 1, 1, 9, 5, 'COVERED'),
+#     (1, 1, 1, 10, 1, 'COVERED'),
+#     (1, 1, 2, 1, 5, 'COVERED'),
+#     (1, 1, 2, 2, 5, 'COVERED'),
+#     (1, 1, 2, 3, 4, 'COVERED'),
+#     (1, 1, 2, 4, 4, 'COVERED'),
+#     (1, 1, 2, 5, 3, 'COVERED'),
+#     (1, 1, 2, 6, 5, 'COVERED'),
+#     (1, 1, 2, 7, 5, 'COVERED'),
+#     (1, 1, 2, 8, 2, 'COVERED'),
+#     (1, 1, 2, 9, 5, 'COVERED'),
+#     (1, 1, 2, 10, 1, 'COVERED'),
+#     (1, 1, 3, 1, 5, 'COVERED'),
+#     (1, 1, 3, 2, 5, 'COVERED'),
+#     (1, 1, 3, 3, 4, 'COVERED'),
+#     (1, 1, 3, 4, 4, 'COVERED'),
+#     (1, 1, 3, 5, 3, 'COVERED'),
+#     (1, 1, 3, 6, 5, 'COVERED'),
+#     (1, 1, 3, 7, 5, 'COVERED'),
+#     (1, 1, 3, 8, 2, 'COVERED'),
+#     (1, 1, 3, 9, 5, 'COVERED'),
+#     (1, 1, 3, 10, 1, 'COVERED'),
+#     (1, 1, 4, 1, 5, 'COVERED'),
+#     (1, 1, 4, 2, 5, 'COVERED'),
+#     (1, 1, 4, 3, 4, 'COVERED'),
+#     (1, 1, 4, 4, 4, 'COVERED'),
+#     (1, 1, 4, 5, 3, 'COVERED'),
+#     (1, 1, 4, 6, 5, 'COVERED'),
+#     (1, 1, 4, 7, 5, 'COVERED'),
+#     (1, 1, 4, 8, 2, 'COVERED'),
+#     (1, 1, 4, 9, 5, 'COVERED'),
+#     (1, 1, 4, 10, 1, 'COVERED'),
+#     (1, 1, 5, 1, 5, 'COVERED'),
+#     (1, 1, 5, 2, 5, 'COVERED'),
+#     (1, 1, 5, 3, 4, 'COVERED'),
+#     (1, 1, 5, 4, 4, 'COVERED'),
+#     (1, 1, 5, 5, 3, 'COVERED'),
+#     (1, 1, 5, 6, 5, 'COVERED'),
+#     (1, 1, 5, 7, 5, 'COVERED'),
+#     (1, 1, 5, 8, 2, 'COVERED'),
+#     (1, 1, 5, 9, 5, 'COVERED'),
+#     (1, 1, 5, 10, 1, 'COVERED'),
+#     (1, 1, 6, 1, 5, 'COVERED'),
+#     (1, 1, 6, 2, 5, 'COVERED'),
+#     (1, 1, 6, 3, 4, 'COVERED'),
+#     (1, 1, 6, 4, 4, 'COVERED'),
+#     (1, 1, 6, 5, 3, 'COVERED'),
+#     (1, 1, 6, 6, 5, 'COVERED'),
+#     (1, 1, 6, 7, 5, 'COVERED'),
+#     (1, 1, 6, 8, 2, 'COVERED'),
+#     (1, 1, 6, 9, 5, 'COVERED'),
+#     (1, 1, 6, 10, 1, 'COVERED'),
+#     (1, 1, 7, 1, 5, 'COVERED'),
+#     (1, 1, 7, 2, 5, 'COVERED'),
+#     (1, 1, 7, 3, 4, 'COVERED'),
+#     (1, 1, 7, 4, 4, 'COVERED'),
+#     (1, 1, 7, 5, 3, 'COVERED'),
+#     (1, 1, 7, 6, 5, 'COVERED'),
+#     (1, 1, 7, 7, 5, 'COVERED'),
+#     (1, 1, 7, 8, 2, 'COVERED'),
+#     (1, 1, 7, 9, 5, 'COVERED'),
+#     (1, 1, 7, 10, 1, 'COVERED'),
+#     (1, 1, 8, 1, 5, 'COVERED'),
+#     (1, 1, 8, 2, 5, 'COVERED'),
+#     (1, 1, 8, 3, 4, 'COVERED'),
+#     (1, 1, 8, 4, 4, 'COVERED'),
+#     (1, 1, 8, 5, 3, 'COVERED'),
+#     (1, 1, 8, 6, 5, 'COVERED'),
+#     (1, 1, 8, 7, 5, 'COVERED'),
+#     (1, 1, 8, 8, 2, 'COVERED'),
+#     (1, 1, 8, 9, 5, 'COVERED'),
+#     (1, 1, 8, 10, 1, 'COVERED'),
+#     (1, 1, 9, 1, 5, 'COVERED'),
+#     (1, 1, 9, 2, 5, 'COVERED'),
+#     (1, 1, 9, 3, 4, 'COVERED'),
+#     (1, 1, 9, 4, 4, 'COVERED'),
+#     (1, 1, 9, 5, 3, 'COVERED'),
+#     (1, 1, 9, 6, 5, 'COVERED'),
+#     (1, 1, 9, 7, 5, 'COVERED'),
+#     (1, 1, 9, 8, 2, 'COVERED'),
+#     (1, 1, 9, 9, 5, 'COVERED'),
+#     (1, 1, 9, 10, 1, 'COVERED'),
+#     (1, 1, 10, 1, 5, 'COVERED'),
+#     (1, 1, 10, 2, 5, 'COVERED'),
+#     (1, 1, 10, 3, 4, 'COVERED'),
+#     (1, 1, 10, 4, 4, 'COVERED'),
+#     (1, 1, 10, 5, 3, 'COVERED'),
+#     (1, 1, 10, 6, 5, 'COVERED'),
+#     (1, 1, 10, 7, 5, 'COVERED'),
+#     (1, 1, 10, 8, 2, 'COVERED'),
+#     (1, 1, 10, 9, 5, 'COVERED'),
+#     (1, 1, 10, 10, 1, 'COVERED');
 
 -- 예: member_id=1 이 다이아몬드 상자를 뽑음
 # INSERT INTO gacha_draw_log (member_id, gacha_shared_board_id, board_version, gacha_prize_id)
 
-INSERT INTO gacha_reward_grant (gacha_shared_board_id, grant_status)
-VALUES (10, 'QUEUED');
+# INSERT INTO gacha_reward_grant (gacha_shared_board_id, grant_status)
+# VALUES (10, 'QUEUED');
 
 -- ----------------------------
 -- 1. allergy (알러지 마스터 목록) 더미 데이터
@@ -767,8 +965,8 @@ INSERT INTO food_allergy (meal_id, allergy_id) VALUES
                                                    (3, 3); -- 3번 식사: '갑각류' 포함
 
 
-
 insert into base_of_point
 (description, point )
 values ('일별 로그인 흭득 포인트', 10),
        ('회원가입 흭득 포인트', 1000);
+
