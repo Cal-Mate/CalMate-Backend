@@ -129,7 +129,16 @@ public class GachaCommandService {
             VALUES (?,?,?,?,?,?,?)
             """, memberId, eventId, cell.getId(), cell.getBoardVersion(), actualPrizeId, prize != null ? prize.getRank() : 0, "SUCCESS");
 
-        // 6) 1등(최고 등급) 경품을 뽑았는지 확인하고, 뽑았다면 보드 리셋
+        // 6) 포인트 경품인 경우 포인트 지급
+        if ("100 포인트".equals(prizeTier)) {
+            // 포인트 지급
+            pointsPort.addPoints(memberId, 100, "GACHA_REWARD");
+
+            // 포인트 지급 이력 기록
+            recordPointHistory(memberId, eventId, 100, Point.Distinction.EARN);
+        }
+
+        // 7) 1등(최고 등급) 경품을 뽑았는지 확인하고, 뽑았다면 보드 리셋
         if (prize != null) {
             // 최고 등급(가장 작은 rank)인지 확인
             Integer topRank = prizeRepository.findFirstByEvent_IdOrderByRankAsc(eventId)
@@ -142,7 +151,7 @@ public class GachaCommandService {
             }
         }
 
-        // 6) 남은 재고 카운트
+        // 8) 남은 재고 카운트
         Long remain = jdbc.queryForObject("""
             SELECT COUNT(*) FROM gacha_prize_inventory
             WHERE event_id=? AND status='READY'
@@ -166,31 +175,38 @@ public class GachaCommandService {
     /**
      * 재고(gacha_prize_inventory)를 자동으로 재충전하는 메서드
      * 모든 경품이 소진되면 새로운 보드를 생성하고 재고를 다시 채움
+     * 고정된 경품 목록으로 재고를 채웁니다.
      */
     private void refillInventory(Long eventId) {
-        // 1) 이벤트의 모든 경품 조회
-        List<GachaPrizeEntity> prizes = prizeRepository.findAllByEvent_IdOrderByRankAsc(eventId);
-        if (prizes.isEmpty()) {
-            throw new IllegalStateException("No prizes configured for event: " + eventId);
-        }
+        // 고정 경품 목록 및 수량 정의
+        String[][] fixedPrizes = {
+            {"츄잉껌", "10"},      // 경품명, 수량
+            {"츄파춥스", "15"},
+            {"100 포인트", "25"},
+            {"꽝", "50"}
+        };
 
-        // 2) gacha_prize_inventory에 새로운 재고 추가
-        for (GachaPrizeEntity prize : prizes) {
-            // 각 경품의 수량만큼 재고 추가
-            var quantity = prize.getQuantity();
-            int count = (quantity != null && quantity.getCount() != null) ? quantity.getCount() : 10;
+        // gacha_prize_inventory에 고정 경품 재고 추가
+        for (String[] prize : fixedPrizes) {
+            String prizeName = prize[0];
+            int count = Integer.parseInt(prize[1]);
 
             for (int i = 0; i < count; i++) {
                 jdbc.update("""
                     INSERT INTO gacha_prize_inventory
-                    (event_id, prize_tier, prize_rank, status, created_at, updated_at)
-                    VALUES (?, ?, ?, 'READY', NOW(), NOW())
+                    (event_id, prize_tier, status)
+                    VALUES (?, ?, 'READY')
                     """,
                     eventId,
-                    prize.getName(),
-                    prize.getRank()
+                    prizeName
                 );
             }
+        }
+
+        // 이벤트의 모든 경품 조회 (보드 생성용)
+        List<GachaPrizeEntity> prizes = prizeRepository.findAllByEvent_IdOrderByRankAsc(eventId);
+        if (prizes.isEmpty()) {
+            throw new IllegalStateException("No prizes configured for event: " + eventId);
         }
 
         // 3) 새로운 보드 버전 생성 (모든 셀을 COVERED로 리셋)

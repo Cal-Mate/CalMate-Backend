@@ -31,6 +31,12 @@ public class BingoBoardEntity {
     @Column(name = "member_id")
     private Long memberId;
 
+    @Column(name = "completed_line_count")
+    private Integer completedLineCount;
+
+    @Column(name = "completed")
+    private Boolean completed;
+
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
     private List<BingoCellEntity> cells;
 }

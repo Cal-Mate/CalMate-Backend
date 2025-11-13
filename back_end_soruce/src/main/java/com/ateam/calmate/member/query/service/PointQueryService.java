@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,16 +88,6 @@ public class PointQueryService {
     }
 
     private LocalDateTime resolveOccurredAt(Point point) {
-        Integer historyTime = point.getHistoyTime();
-        if (historyTime == null || historyTime <= 0) {
-            return null;
-        }
-
-        long epochSeconds = historyTime.longValue();
-        if (epochSeconds > 9_999_999_999L) {
-            return null;
-        }
-
-        return LocalDateTime.ofEpochSecond(epochSeconds, 0, ZoneOffset.UTC);
+        return point.getHistoryTime();
     }
 }

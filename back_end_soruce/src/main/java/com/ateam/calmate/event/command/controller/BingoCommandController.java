@@ -11,9 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/api/bingo")
 @RequiredArgsConstructor
+@Slf4j
 public class BingoCommandController {
 
     private final BingoCommandServiceImpl service;
@@ -28,6 +31,8 @@ public class BingoCommandController {
             @RequestParam(required = false) Long extendFilePathId,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws Exception {
+        log.debug("checkCellWithUpload requested - memberId: {}, boardId: {}, cellId: {}, extendFilePathId: {}",
+                memberId, boardId, cellId, extendFilePathId);
 
         // 현재 월 보드 자동 생성 및 반환
         var currentYm = KstYearMonth.now();
@@ -35,11 +40,15 @@ public class BingoCommandController {
 
         // 요청된 boardId가 현재 월 보드가 아니면 400 Bad Request 반환
         if (!ensuredBoard.getId().equals(boardId)) {
+            log.warn("Rejected bingo check - ensured board {} != requested board {} (memberId={}, yearMonth={})",
+                    ensuredBoard.getId(), boardId, memberId, currentYm);
             return ResponseEntity.badRequest().build();
         }
 
         // 파일이 제공되지 않은 경우 400 Bad Request 반환
         if (file == null || file.isEmpty()) {
+            log.warn("Rejected bingo check - missing file (memberId={}, boardId={}, cellId={})",
+                    memberId, boardId, cellId);
             return ResponseEntity.badRequest().build();
         }
 
@@ -54,6 +63,7 @@ public class BingoCommandController {
                 .build();
 
         var result = service.checkCellWithUpload(cmd, file.getInputStream());
+        log.debug("checkCellWithUpload succeeded - memberId: {}, boardId: {}, cellId: {}", memberId, boardId, cellId);
         return ResponseEntity.ok(result);
     }
 
