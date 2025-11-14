@@ -11,6 +11,13 @@
         <result property="newMembers" column="new_member"/>
         <result property="totalMembers" column="total_member"/>
     </resultMap>
+
+    <resultMap id="adminDashBoard" type="com.ateam.calmate.admin.query.dto.AdminDashBoardDTO">
+        <result property="post" column="post"/>
+        <result property="qna" column="qna"/>
+        <result property="report" column="report"/>
+        <result property="point" column="point"/>
+    </resultMap>
     <select id="selectMemberSituation" resultMap="memberSituation">
         SELECT
                sum(case when status = 1 then 1 else 0 end) as active_member
@@ -21,5 +28,29 @@
         FROM member;
     </select>
 
+    <select id="selectAdminDashBoard" resultMap="adminDashBoard">
+        select
+            sum(post) as post,
+            sum(qna) as qna,
+            sum(report) as report,
+            sum(point) as point
+        from(
+                select count(*) as post, 0 as qna , 0 as report, 0 as point
+                from post p
+                union
+                select  0 as post, count(*) as qna , 0 as report, 0 as point
+                from qna
+                union
+                select  0 as post, 0 as qna ,count(*) as report, 0 as point
+                from report
+                union
+                select 0 as post, 0 as qna , 0 as report, sum(point) as point
+                from member
+            ) as a
+
+
+
+
+    </select>
 
 </mapper>

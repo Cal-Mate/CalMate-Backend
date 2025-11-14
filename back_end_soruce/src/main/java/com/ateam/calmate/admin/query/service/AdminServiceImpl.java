@@ -1,5 +1,6 @@
 package com.ateam.calmate.admin.query.service;
 
+import com.ateam.calmate.admin.query.dto.AdminDashBoardDTO;
 import com.ateam.calmate.admin.query.dto.MemberSituationDTO;
 import com.ateam.calmate.admin.query.dto.ResponseDashboardCurrentSituationDTO;
 import com.ateam.calmate.admin.query.mapper.MemberQueryMapper;
@@ -30,5 +31,12 @@ public class AdminServiceImpl implements AdminService {
         ResponseDashboardCurrentSituationDTO responseData
                 = modelMapper.map(memberSituationDTO, ResponseDashboardCurrentSituationDTO.class);
         return responseData;
+    }
+
+    @Override
+    public AdminDashBoardDTO getDashboard() {
+        AdminDashBoardDTO dashboard = memberQueryMapper.selectAdminDashBoard();
+
+        return dashboard;
     }
 }

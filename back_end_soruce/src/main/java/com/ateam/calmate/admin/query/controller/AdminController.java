@@ -1,5 +1,6 @@
 package com.ateam.calmate.admin.query.controller;
 
+import com.ateam.calmate.admin.query.dto.AdminDashBoardDTO;
 import com.ateam.calmate.admin.query.dto.ResponseDashboardCurrentSituationDTO;
 import com.ateam.calmate.admin.query.service.AdminService;
 import com.ateam.calmate.common.ResponseMessage;
@@ -27,9 +28,12 @@ public class AdminController {
         ResponseDashboardCurrentSituationDTO responseData =
                 adminService.getDashboardSituation();
 
+        AdminDashBoardDTO dashboard =  adminService.getDashboard();
+
         ResponseMessage responseMessage = new ResponseMessage();
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("responseData", responseData);
+        responseMap.put("dashboard", dashboard);
 
         responseMessage.setHttpStatus(HttpStatus.OK.value());
         responseMessage.setResult(responseMap);
