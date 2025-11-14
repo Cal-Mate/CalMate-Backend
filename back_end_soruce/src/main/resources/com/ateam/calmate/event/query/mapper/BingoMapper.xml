@@ -287,7 +287,6 @@
         ON efp.id = bfu.extend_file_path_id
 
         WHERE bb.id = #{boardId}
-
         /* 보드 → 셀 → 업로드 순으로 정렬(그룹핑 안정화) */
         ORDER BY bb.id, bc.`row`, bc.`col`, bfu.id DESC
     </select>
