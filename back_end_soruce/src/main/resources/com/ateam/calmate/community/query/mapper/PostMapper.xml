@@ -10,7 +10,8 @@
             p.title,
             p.content,
             p.member_id AS memberId,                <!-- ✅ 게시글 작성자 memberId 추가 -->
-            DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') AS createdAt,
+--             DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') AS createdAt,
+            DATE_FORMAT(CONVERT_TZ(p.created_at, '+00:00', '+09:00'), '%Y-%m-%d %H:%i') AS createdAt,
             t.name AS tagName,
             p.visibility,
             m.nickname AS authorName,

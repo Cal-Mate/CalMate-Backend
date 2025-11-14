@@ -185,12 +185,18 @@ public class AiDietCommandService {
         exerciseRequest.setGender(request.getGender());
         exerciseRequest.setHeight(request.getHeight());
         exerciseRequest.setWeight(request.getWeight());
+        exerciseRequest.setBodyMetric(request.getBodyMetric());
         GoalQueryDTO result = aiDietQueryService.getMemberGoalInfo(request.getMemberId());
+        if (result == null) {
+            // try-catch로 메시지를 "반환(return)"하는 대신,
+            // 예외를 "발생(throw)"시킵니다.
+            log.warn("회원 ID {}에 대한 목표 정보를 찾을 수 없습니다.", request.getMemberId());
+            throw new MemberGoalNotFoundException("회원의 목표 정보가 설정되어 있지 않습니다. 목표를 먼저 설정해주세요.");
+        }
         exerciseRequest.setGoalType(result.getGoalType());
         exerciseRequest.setTargetValue(result.getTargetValue());
         exerciseRequest.setStartDate(result.getStartDate());
         exerciseRequest.setEndDate(result.getEndDate());
-        exerciseRequest.setBodyMetric(request.getBodyMetric());
 
         return exerciseRequest;
     }
