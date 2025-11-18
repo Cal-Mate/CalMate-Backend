@@ -80,6 +80,7 @@ public class RefreshTokenServiceImple implements RefreshTokenService {
 
         // (옵션) 디바이스 바인딩 체크: 발급 당시 deviceFp와 다르면 추가 인증/거부 정책 가능
         if (e.getDeviceFp() != null && deviceFp != null && !e.getDeviceFp().equals(deviceFp)) {
+            log.warn("RT 실패: 디바이 정보 오류. getDeviceFp= {} , deviceFp = {}", e.getDeviceFp(), deviceFp);
             throw new RuntimeException("Device fingerprint changed");
         }
 
@@ -152,7 +153,7 @@ public class RefreshTokenServiceImple implements RefreshTokenService {
 
         ResponseTokenDTO response = new ResponseTokenDTO(refresh, access);
 
-
+        log.info("리프래시 토큰 갱신 old_jti = {} , new_jti = {}, device = {}", jti,newJti, deviceFp);
         return response;
     }
 

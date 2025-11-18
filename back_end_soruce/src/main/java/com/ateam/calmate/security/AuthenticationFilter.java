@@ -115,6 +115,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // 쿠키로 리프레시 전달
         ResponseCookie cookie = cookieUtil.createRefreshCookie(refreshToken);
 
+        log.info("리프래시 토큰 생성  jti = {}, device = {}", refreshJti, device);
+
         response.addHeader("token", accessToken);
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
